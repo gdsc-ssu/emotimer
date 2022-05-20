@@ -1,7 +1,7 @@
 package com.example.authservice.api.entity.user;
 
-import com.example.authservice.oauth.ProviderType;
-import com.example.authservice.oauth.RoleType;
+import com.example.authservice.oauth.entity.ProviderType;
+import com.example.authservice.oauth.entity.RoleType;
 import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
@@ -35,7 +35,7 @@ public class User {
     @Column(name = "PASSWORD")
     private String password;
 
-    @NotNull
+//    @NotNull
     @Size(max = 100)
     @Column(name = "USERNAME")
     private String username;

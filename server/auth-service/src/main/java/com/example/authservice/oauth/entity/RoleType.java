@@ -1,4 +1,4 @@
-package com.example.authservice.oauth;
+package com.example.authservice.oauth.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
