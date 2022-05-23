@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -65,6 +66,10 @@ public class User {
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
 
+    @Column(name = "IMAGE_URL")
+    private String imageUrl;
+
+    @Builder
     public User(String email, String password, String username, ProviderType providerType, RoleType roleType){
         this.email = email;
         this.password = password;
