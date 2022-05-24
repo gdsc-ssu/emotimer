@@ -21,6 +21,13 @@ spring:
         current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
         format_sql: true
 
+  devtools:
+    livereload:
+      enabled: true # 정적 파일들의 실시간 갱신
+  thymeleaf:
+    cache: false # thymeleaf 에 대한 캐시를 남기지 않음
+    prefix: classpath:/templates/
+    suffix: .html
   # Security OAuth
   security:
     oauth2:
