@@ -62,7 +62,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             if (providerType != savedUser.getProviderType()){ // 가입된 회원이긴 한데 이전에 로그인한 소셜과 다른 소셜로 로그인 한 경우.
                 throw new OAuthProviderMissMatchException(
-                      "이전에 " + providerType + " 계정으로 로그인하셨던 적이 있삼! "  + providerType + " 으로 다시 로그인해주면 감사할듯!"
+                      "이전에 " + providerType + " 계정으로 로그인하셨던 적이 있습니다. "  + providerType + " 으로 로그인해주세요."
                 );
             }
             savedUser = updateUser(savedUser, userInfo); // 그냥 유저 정보 업데이트 된거 있으면 업데이트만!
