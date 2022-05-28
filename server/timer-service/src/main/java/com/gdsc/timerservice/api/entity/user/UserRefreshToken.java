@@ -15,17 +15,20 @@ import javax.validation.constraints.NotNull;
 public class UserRefreshToken {
 
     @Id
-    @Column(name = "USER_ID", unique = true)
-    @NotNull
     @GeneratedValue
-    private String userId;
+    @Column(name = "REFRESH_TOKEN_SEQ")
+    private Long refreshTokenSeq;
+
+    @Column(name = "EMAIL", unique = true)
+    @NotNull
+    private String email;
 
     @Column(name = "REFRESH_TOKEN")
     @NotNull
     private String refreshToken;
 
-    public UserRefreshToken(@NotNull String userId, @NotNull String refreshToken){
-        this.userId = userId;
+    public UserRefreshToken(@NotNull String email, @NotNull String refreshToken){
+        this.email = email;
         this.refreshToken = refreshToken;
     }
 

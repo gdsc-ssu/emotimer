@@ -61,11 +61,11 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 
     @Override
     public String getUsername() {
-        return null;
+        return user.getUsername();
     }
 
     @Override
     public String getName() { // 우리 서비스에서는 이메일로.
-        return null;
+        return user.getEmail();
     }
 }
