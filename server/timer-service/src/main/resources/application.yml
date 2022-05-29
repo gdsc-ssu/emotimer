@@ -1,6 +1,7 @@
 spring:
   profiles:
     active: local
+    include: oauth # application-xxx.properties 파일을 만들면 xxx 라는 프로파일이 생성된다. oauth 프로파일을 include 하겠다.
   # ??? ?? ??
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -29,28 +30,28 @@ spring:
     prefix: classpath:/templates/
     suffix: .html
   # Security OAuth
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: 29116814846-678vhg52ne8rklv3n9m1oln4ek2auood.apps.googleusercontent.com
-            client-secret: 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
-            scope:
-              - email
-              - profile
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          google:
+#            client-id: 29116814846-j83hn3f2rtr42ug43b941sid7f65c6ii.apps.googleusercontent.com
+#            client-secret: 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
+#            scope:
+#              - email
+#              - profile
 
 #          kakao:
 #            client-id:
 #            client-secret:
 
        # Provider ??
-        provider:
-          kakao:
-            authorizationUri: https://kauth.kakao.com/oauth/authorize
-            tokenUri: https://kauth.kakao.com/oauth/token
-            userInfoUri: https://kapi.kakao.com/v2/user/me
-            userNameAttribute: id
+#        provider:
+#          kakao:
+#            authorizationUri: https://kauth.kakao.com/oauth/authorize
+#            tokenUri: https://kauth.kakao.com/oauth/token
+#            userInfoUri: https://kapi.kakao.com/v2/user/me
+#            userNameAttribute: id
 
 # cors ?? -> SecurityConfig.java ??
 
