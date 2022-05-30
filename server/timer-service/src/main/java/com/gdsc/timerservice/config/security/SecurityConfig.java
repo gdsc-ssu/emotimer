@@ -28,10 +28,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserRefreshTokenRepository userRefreshTokenRepository;
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable(); // 일단은 csrf 필터 생성을 막음. 즉 스프링 시큐리티에서 기본적으로 제공하는 csrf 필터를 거치지 않음. 어느 인스턴스에서든 이 서버로 접근 가능하지만, csrf 공격에 취약.
 
         // 메인화면 ("/" 루트 경로) 는 누구나 접근 가능. 이 경로에서 소셜 로그인 진행.
         http.authorizeRequests()
-                .antMatchers("/").permitAll();
+                .antMatchers("/", "/login").permitAll(); // 근데 사실 .anyRequest().permitAll(); 을 아래에서 선언했기 때문에 일단은 따로 설정한 경로를 제외하고는 모든 경로 접근 가능.
 
         // jwt 사용할 것이기 때문에 세션 만들지 않음.
         http.sessionManagement()
