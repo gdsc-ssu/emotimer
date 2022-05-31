@@ -13,20 +13,20 @@
     - SignUp
 - Timer
   - 속성
-    - Status : Ready / Running / Stopped / Succeeded / Failed
+    - Status : Ready / Running / Paused / Succeeded / Failed
     - StartedAt : DateTime
     - RemainedSeconds : Long
     - TotalSeconds : Long
     - Category : CategoryId
   - 행위
     - Start
-    - Stop
-    - Reset(Giveup?)
+    - Pause
+    - Reset
 - Timer History
   - 속성
     - RecordedAt : DateTime
-    - TotalSeconds : Long
-    - RemainedSeconds : Long
+    - TotalMilliSeconds : Long
+    - RemainedMilliSeconds : Long
     - Status : Failed / Succeeded
     - Category : CategoryId
 - Timer Category
@@ -43,8 +43,7 @@
   1. 작업할 내용에 대한 branch를 main에서 분기하고 작업 후 PR를 생성합니다.
   2. 논의가 필요하거나 리뷰가 필요한 내용에 대해서는 PR에서 의사소통합니다.
   3. 리뷰가 늦어지거나 별도의 리뷰가 필요가 없다면 Merge 합니다. 
-  4. 가급적 Squash Merge를 사용하나, 중첩된 브랜치가 있거나, 단일 커밋 브랜치의 경우에는 Rebase merge / Fast-forward merge를 사용합니다.
-3. 
+  4. 가급적 Squash Merge를 사용하나, 중첩된 브랜치가 있거나, 단일 커밋 브랜치의 경우에는 Rebase merge / Fast-forward merge를 사용합니다. 
 
 
 ## Server 
