@@ -38,6 +38,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
         // 토큰이 유효하다면 시큐리티 컨텍스트 홀더에 현재 인증객체 저장.
         if (token.validate()){
+            log.info("유효한 액세스 토큰이 담긴 요청을 하셨습니다.");
             Authentication authentication = tokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

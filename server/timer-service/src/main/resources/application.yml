@@ -56,14 +56,14 @@ spring:
 # cors ?? -> SecurityConfig.java ??
 
 # jwt secret key ??
-jwt:
-  secret: 'gdsc-timer-hello-world-banana-ice-cream-oreo-chocolate-lol'
+#jwt:
+#  secret: 'gdsc-timer-hello-world-banana-ice-cream-oreo-chocolate-lol'
 
 # ?? ?? secret key ? Redirect Uri ??
 app:
   auth:
     tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
-    tokenExpiry: 1800000
+    tokenExpiry: 1800000 # 30분 1000(1초) * 60 * 30
     refreshTokenExpiry: 604800000
   oauth2:
     authorizedRedirectUris:
