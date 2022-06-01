@@ -4,6 +4,5 @@ import com.gdsc.timerservice.api.entity.timer.TimerHub;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TimerRepository extends JpaRepository<TimerHub, Long> {
-
-
+    TimerHub findByUserId(long userId);
 }
