@@ -12,7 +12,7 @@ public class TimerService {
 
     private final TimerRepository timerRepository;
 
-    public void makeTimerHub(TimerRestDto timer) {
+    public void makeTimer(TimerRestDto timer) {
 
         TimerHub timerhub = TimerHub.builder()
             .userId(timer.getUserId())
@@ -24,5 +24,17 @@ public class TimerService {
             .build();
 
         timerRepository.save(timerhub);
+    }
+
+    public TimerRestDto getTimerHub(long timerId) {
+        TimerHub timerHub = timerRepository.getById(timerId);
+
+        return TimerRestDto.builder()
+            .userId(timerHub.getUserId())
+            .startedAt(timerHub.getStartedAt())
+            .totalSeconds(timerHub.getTotalSeconds())
+            .remainedSeconds(timerHub.getRemainedSeconds())
+            .emoji(timerHub.getEmoji())
+            .timerStatus(timerHub.getTimerStatus()).build();
     }
 }
