@@ -2,6 +2,9 @@ package com.gdsc.timerservice.config.security;
 
 import com.gdsc.timerservice.api.repository.user.UserRefreshTokenRepository;
 import com.gdsc.timerservice.config.properties.AppProperties;
+import com.gdsc.timerservice.oauth.entity.RoleType;
+import com.gdsc.timerservice.oauth.filter.TokenAuthenticationFilter;
+import com.gdsc.timerservice.oauth.handler.OAuth2AuthenticationFailureHandler;
 import com.gdsc.timerservice.oauth.handler.OAuth2AuthenticationSuccessHandler;
 import com.gdsc.timerservice.oauth.service.CustomOAuth2UserService;
 import com.gdsc.timerservice.oauth.token.AuthTokenProvider;
@@ -12,6 +15,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @RequiredArgsConstructor
 @EnableWebSecurity // Spring Security 설정을 활성화
@@ -24,10 +28,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserRefreshTokenRepository userRefreshTokenRepository;
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable(); // 일단은 csrf 필터 생성을 막음. 즉 스프링 시큐리티에서 기본적으로 제공하는 csrf 필터를 거치지 않음. 어느 인스턴스에서든 이 서버로 접근 가능하지만, csrf 공격에 취약.
 
         // 메인화면 ("/" 루트 경로) 는 누구나 접근 가능. 이 경로에서 소셜 로그인 진행.
         http.authorizeRequests()
-                .antMatchers("/").permitAll();
+                .antMatchers("/", "/login").permitAll(); // 근데 사실 .anyRequest().permitAll(); 을 아래에서 선언했기 때문에 일단은 따로 설정한 경로를 제외하고는 모든 경로 접근 가능.
 
         // jwt 사용할 것이기 때문에 세션 만들지 않음.
         http.sessionManagement()
@@ -35,33 +40,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // oauth 로그인 설정
         http.oauth2Login()
-//                .authorizationEndpoint()
-//                .baseUri("/oauth2/authorization")
-//                .authorizationRequestRepository(customOAuth2AuthorizationRequestBasedOnCookieRepository())
-//
-//                .and()
-//                .redirectionEndpoint()
-//                .baseUri("/*/oauth2/code/*") // 소셜 로그인이 완료된 후 리다이렉트되는 페이지
-//                .and()
                 .userInfoEndpoint()
                 .userService(oAuth2UserService) // oauth2 로그인 성공시 수행될 서비스 등록. 새로운 사용자라면 db 에 User insert 진행. 아니라면 update 로직 수행.
             .and()
-                .successHandler(oAuth2AuthenticationSuccessHandler()); // 소셜 로그인 성공시, 실행되는 핸들러. jwt 토큰(access token , refresh token) 생성하여 응답
-//                .failureHandler(oAuth2AuthenticationFailureHandler());
+                .successHandler(oAuth2AuthenticationSuccessHandler()) // 소셜 로그인 성공시, 실행되는 핸들러. jwt 토큰(access token , refresh token) 생성하여 응답
+                .failureHandler(oAuth2AuthenticationFailureHandler());
 
-//        http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        // URL 별 권한 관리. authorizeRequests 가 선언되어야만 antMatchers 옵션을 사용할 수 있음.
+        http.authorizeRequests()
+                .antMatchers("/api/**").hasAnyAuthority(RoleType.USER.getCode()) // "/api/**" USER 권한이 있어야 접근가능.
+                .antMatchers("/api/**/admin/**").hasAnyAuthority(RoleType.ADMIN.getCode()) // "/api/**/admin/**" ADMIN 권한이 있어야 접근가능.
+                .anyRequest().permitAll(); // 위 경로를 제외한 나머지 모든 요청은 접근 허용. .anyRequest.authenticated() 로 한다면 우리 서버로의 모든 접근은 "인증"된 사용자만 들어올 수 있게 됨.
+
+        http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }
 
-
     /**
-     * 쿠키 기반 인가 Repository
-     * 인가 검증시 사용.
+     * 토큰 필터 설정
      */
-//    @Bean
-//    public CustomOAuth2AuthorizationRequestBasedOnCookieRepository customOAuth2AuthorizationRequestBasedOnCookieRepository(){
-//        return new CustomOAuth2AuthorizationRequestBasedOnCookieRepository();
-//    }
+    @Bean
+    public TokenAuthenticationFilter tokenAuthenticationFilter(){
+        return new TokenAuthenticationFilter(tokenProvider);
+    }
 
     /**
      * OAuth 인증 성공 핸들러. OAuth 인증 성공시 실행됨.
@@ -74,6 +75,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 appProperties,
                 userRefreshTokenRepository
         );
+    }
+
+    /**
+     * OAuth 인증 실패 핸들러.
+     */
+    @Bean
+    public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler(){
+        return new OAuth2AuthenticationFailureHandler();
     }
 
 }

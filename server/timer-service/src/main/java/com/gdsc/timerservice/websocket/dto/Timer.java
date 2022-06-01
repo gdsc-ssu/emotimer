@@ -1,6 +1,6 @@
 package com.gdsc.timerservice.websocket.dto;
 
-import com.gdsc.timerservice.timer.enums.TimerStatus;
+import com.gdsc.timerservice.websocket.enums.TimerOperation;
 import lombok.Getter;
 
 @Getter
@@ -8,5 +8,8 @@ public class Timer {
 
     private long userId;
 
-    private TimerStatus timerStatus;
+    //milli
+    private long serverTime;
+
+    private TimerOperation timerStatus;
 }
