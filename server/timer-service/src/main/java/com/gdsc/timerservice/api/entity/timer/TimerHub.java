@@ -2,12 +2,17 @@ package com.gdsc.timerservice.api.entity.timer;
 
 import com.gdsc.timerservice.common.enums.Emoji;
 import com.gdsc.timerservice.common.enums.TimerStatus;
-import com.gdsc.timerservice.websocket.enums.TimerOperation;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class TimerHub {
 
     @Id
@@ -30,7 +35,7 @@ public class TimerHub {
     private Long remainedSeconds;
 
     @Column
-    private Emoji Emoji;
+    private Emoji emoji;
 
     @Column
     @Enumerated(EnumType.STRING)

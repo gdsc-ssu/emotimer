@@ -4,7 +4,7 @@ import com.gdsc.timerservice.websocket.enums.TimerOperation;
 import lombok.Getter;
 
 @Getter
-public class Timer {
+public class TimerWebSocketDto {
 
     private long userId;
 
