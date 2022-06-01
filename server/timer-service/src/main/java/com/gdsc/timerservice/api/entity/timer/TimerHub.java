@@ -1,4 +1,4 @@
-package com.gdsc.timerservice.timer.entity;
+package com.gdsc.timerservice.api.entity.timer;
 
 import com.gdsc.timerservice.common.enums.Emoji;
 import com.gdsc.timerservice.timer.enums.TimerStatus;

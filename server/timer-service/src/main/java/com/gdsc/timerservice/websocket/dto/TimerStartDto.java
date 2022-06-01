@@ -1,4 +1,4 @@
-package com.gdsc.timerservice.timer.websocket.dto;
+package com.gdsc.timerservice.websocket.dto;
 
 import lombok.Getter;
 
