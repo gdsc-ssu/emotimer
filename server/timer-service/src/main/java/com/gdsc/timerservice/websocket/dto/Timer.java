@@ -9,5 +9,4 @@ public class Timer {
     private long userId;
 
     private TimerStatus timerStatus;
-
 }

@@ -1,8 +1,6 @@
 package com.gdsc.timerservice.websocket;
 
 import com.gdsc.timerservice.websocket.dto.Timer;
-import com.gdsc.timerservice.websocket.dto.TimerPauseDto;
-import com.gdsc.timerservice.websocket.dto.TimerStartDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
