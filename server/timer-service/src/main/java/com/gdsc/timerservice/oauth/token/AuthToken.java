@@ -57,7 +57,8 @@ public class AuthToken {
         }catch (SecurityException | MalformedJwtException e){
             log.info("유효하지 않은 JWT 시그니처임.");
         } catch (ExpiredJwtException e){
-            log.info("만료된 JWT 토큰임.");
+            log.info("만료된 JWT 토큰임."); // accessToken 이 만료된 경우, refresh token 을 확인하기 위해 예외를 던짐.
+            throw e;
         }catch (UnsupportedJwtException e){
             log.info("지원되지 않는 JWT 토큰임.");
         }catch (IllegalArgumentException e){

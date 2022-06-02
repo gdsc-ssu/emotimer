@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Controller
 public class UserController {
-    @GetMapping("/")
+    @GetMapping("/") // 메인 페이지. 소셜 로그인할 수 있는 링크들 있음.
     public String hello(){
         return "index";
     }

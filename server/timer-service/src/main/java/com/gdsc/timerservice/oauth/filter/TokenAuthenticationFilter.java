@@ -1,8 +1,10 @@
 package com.gdsc.timerservice.oauth.filter;
 
+import com.gdsc.timerservice.oauth.exception.AccessTokenExpiredException;
 import com.gdsc.timerservice.oauth.token.AuthToken;
 import com.gdsc.timerservice.oauth.token.AuthTokenProvider;
 import com.gdsc.timerservice.util.HeaderUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -16,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * TokenAuthenticationFilter 는 OncePerRequestFilter 클래스를 상속받았기 때문에 매 요청마다 불려질것임.
+ * TokenAuthenticationFilter 는 OncePerRequestFilter 클래스를 상속받았기 때문에 "매 요청마다 불려질것" 임.
  * 이 필터에서는 요청헤더에서 토큰을 꺼내 유효성 검사를 진행한다.
  *
  * 토큰이 유효하다면 SecurityContextHolder 에 인증객체를 저장하고,
@@ -37,10 +39,14 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         AuthToken token = tokenProvider.convertAuthToken(tokenStr);
 
         // 토큰이 유효하다면 시큐리티 컨텍스트 홀더에 현재 인증객체 저장.
-        if (token.validate()){
-            log.info("유효한 액세스 토큰이 담긴 요청을 하셨습니다.");
-            Authentication authentication = tokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        try{
+            if (token.validate()){
+                log.info("유효한 액세스 토큰이 담긴 요청을 하셨습니다.");
+                Authentication authentication = tokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        }catch (ExpiredJwtException e){
+            throw new AccessTokenExpiredException();
         }
 
         // 이후 나머지 필터를 타게 하자~
