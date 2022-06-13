@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gdsc.timerservice.api.service.OAuth2Service;
 import com.gdsc.timerservice.oauth.entity.ProviderType;
-import com.gdsc.timerservice.oauth.info.OAuth2UserInfo;
-import com.gdsc.timerservice.oauth.info.impl.KakaoOAuth2UserInfo;
 import com.gdsc.timerservice.oauth.model.KakaoOAuthToken;
 import com.gdsc.timerservice.oauth.model.KakaoProfile;
 import lombok.RequiredArgsConstructor;
@@ -85,15 +83,16 @@ public class OAuthController {
         );
 
         System.out.println("== 사용자 프로필 출력 ==: " + response2);
+
         // 유저 프로필 매핑 완료
         KakaoProfile kakaoProfile = mapper.readValue(response2.getBody(), KakaoProfile.class);
         System.out.println(kakaoProfile);
         String email = kakaoProfile.getKakaoAccount().getEmail(); // 이메일 추출
+        String username = kakaoProfile.getKakaoAccount().getProfile().getNickname();// TODO 사용자 이름 추출하여 DB 에 넘겨주어야함. 근데 그냥 유저 모델 객체를 만들자.
         System.out.println("추출한 이메일: " + email);
 
-        // 강제 회원가입
-        // oAuth2Service.join(email, ProviderType.KAKAO);
-
-        return "index";
+        // 강제 회원가입 시작
+        oAuth2Service.join(email,username, ProviderType.KAKAO);
+        return "kakao success";
     }
 }

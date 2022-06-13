@@ -25,6 +25,7 @@ public class KakaoProfile {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    @Data
     public static class Profile {
         String nickname;
     }
