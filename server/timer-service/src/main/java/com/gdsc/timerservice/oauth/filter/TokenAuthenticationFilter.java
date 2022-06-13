@@ -1,6 +1,6 @@
 package com.gdsc.timerservice.oauth.filter;
 
-import com.gdsc.timerservice.oauth.exception.AccessTokenExpiredException;
+import com.gdsc.timerservice.oauth.service.IssueRefreshService;
 import com.gdsc.timerservice.oauth.token.AuthToken;
 import com.gdsc.timerservice.oauth.token.AuthTokenProvider;
 import com.gdsc.timerservice.util.HeaderUtil;
@@ -28,28 +28,39 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private final AuthTokenProvider tokenProvider;
+    private final IssueRefreshService issueRefreshService;
 
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
-
+        // 액세스 토큰
         String tokenStr = HeaderUtil.getAccessToken(request);
         AuthToken token = tokenProvider.convertAuthToken(tokenStr);
 
-        // 토큰이 유효하다면 시큐리티 컨텍스트 홀더에 현재 인증객체 저장.
-        try{
-            if (token.validate()){
-                log.info("유효한 액세스 토큰이 담긴 요청을 하셨습니다.");
-                Authentication authentication = tokenProvider.getAuthentication(token);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        }catch (ExpiredJwtException e){
-            throw new AccessTokenExpiredException();
-        }
+        // 리프레시 토큰
+        String refreshTokenStr = HeaderUtil.getAccessToken(request);
+        AuthToken refreshToken = tokenProvider.convertAuthToken(refreshTokenStr);
 
+        // 토큰이 유효하다면 시큐리티 컨텍스트 홀더에 현재 인증객체 저장.
+        try {
+            if (token.validate()) {
+                setAuthentication(token);
+            }
+        } catch (ExpiredJwtException e) {
+            log.info("토큰 만료됨");
+            issueRefreshService.refreshToken(request, response);
+            // throw new AccessTokenExpiredException(); // 예외를 여기서 터뜨리면, 사용자 화면에 바로 에러 스택이 보이게 됨.
+        }
+        log.info("이후 필터를 타는가?");
         // 이후 나머지 필터를 타게 하자~
         filterChain.doFilter(request, response);
+    }
+
+    private void setAuthentication(AuthToken token) {
+        log.info("유효한 액세스 토큰이 담긴 요청을 하셨습니다.");
+        Authentication authentication = tokenProvider.getAuthentication(token);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

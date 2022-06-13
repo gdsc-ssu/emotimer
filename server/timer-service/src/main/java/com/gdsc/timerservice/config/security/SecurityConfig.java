@@ -7,6 +7,7 @@ import com.gdsc.timerservice.oauth.filter.TokenAuthenticationFilter;
 import com.gdsc.timerservice.oauth.handler.OAuth2AuthenticationFailureHandler;
 import com.gdsc.timerservice.oauth.handler.OAuth2AuthenticationSuccessHandler;
 import com.gdsc.timerservice.oauth.service.CustomOAuth2UserService;
+import com.gdsc.timerservice.oauth.service.IssueRefreshService;
 import com.gdsc.timerservice.oauth.token.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -18,9 +19,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @RequiredArgsConstructor
-@EnableWebSecurity // Spring Security 설정을 활성화
+@EnableWebSecurity(debug = true) // Spring Security 설정을 활성화
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private final IssueRefreshService issueRefreshService;
 
     private final CustomOAuth2UserService oAuth2UserService;
     private final AppProperties appProperties;
@@ -28,7 +30,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserRefreshTokenRepository userRefreshTokenRepository;
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable(); // 일단은 csrf 필터 생성을 막음. 즉 스프링 시큐리티에서 기본적으로 제공하는 csrf 필터를 거치지 않음. 어느 인스턴스에서든 이 서버로 접근 가능하지만, csrf 공격에 취약.
+        http.csrf().disable(); // 일단은 csrf 필터 생성을 막음. 즉 스프링 시큐리티에서 기본적으로 제공하는 csrf 필터를 거치지 않음. 어느 인스턴스에서든 이 서버로 접근 가능하지만, csrf 공격에 취약. 그냥 jwt 토큰으로만 접근관리 하겠음.
 
         // 메인화면 ("/" 루트 경로) 는 누구나 접근 가능. 이 경로에서 소셜 로그인 진행.
         http.authorizeRequests()
@@ -48,7 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // URL 별 권한 관리. authorizeRequests 가 선언되어야만 antMatchers 옵션을 사용할 수 있음.
         http.authorizeRequests()
-                .antMatchers("/api/**").hasAnyAuthority(RoleType.USER.getCode()) // "/api/**" USER 권한이 있어야 접근가능.
+                .antMatchers("/api/**/user/**").hasAnyAuthority(RoleType.USER.getCode()) // "/api/**" USER 권한이 있어야 접근가능.
                 .antMatchers("/api/**/admin/**").hasAnyAuthority(RoleType.ADMIN.getCode()) // "/api/**/admin/**" ADMIN 권한이 있어야 접근가능.
                 .anyRequest().permitAll(); // 위 경로를 제외한 나머지 모든 요청은 접근 허용. .anyRequest.authenticated() 로 한다면 우리 서버로의 모든 접근은 "인증"된 사용자만 들어올 수 있게 됨.
 
@@ -61,7 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter(){
-        return new TokenAuthenticationFilter(tokenProvider);
+        return new TokenAuthenticationFilter(tokenProvider,issueRefreshService);
     }
 
     /**

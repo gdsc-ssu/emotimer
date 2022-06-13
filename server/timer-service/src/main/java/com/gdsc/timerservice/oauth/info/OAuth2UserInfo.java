@@ -1,7 +1,11 @@
 package com.gdsc.timerservice.oauth.info;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 import java.util.Map;
 
+@NoArgsConstructor
 public abstract class OAuth2UserInfo {
     protected Map<String, Object> attributes;
 
