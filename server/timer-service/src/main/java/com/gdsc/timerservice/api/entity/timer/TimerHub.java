@@ -34,6 +34,7 @@ public class TimerHub {
     @Column
     private Long remainedSeconds;
 
+    //TODO CategoryId로 변경될 수도 있음
     @Column
     private Emoji emoji;
 

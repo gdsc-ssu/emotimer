@@ -1,57 +1,60 @@
 package com.gdsc.timerservice.api.service.timer;
 
-import com.gdsc.timerservice.api.dtos.TimerRestDto;
+import static com.gdsc.timerservice.common.enums.TimerStatus.READY;
+
+import com.gdsc.timerservice.api.dtos.timer.request.MakeTimerRequest;
+import com.gdsc.timerservice.api.dtos.timer.response.CreateTimerResponse;
+import com.gdsc.timerservice.api.dtos.timer.response.GetTimerResponse;
 import com.gdsc.timerservice.api.entity.timer.TimerHub;
 import com.gdsc.timerservice.api.repository.timer.TimerRepository;
-import com.gdsc.timerservice.common.enums.TimerStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.gdsc.timerservice.common.enums.TimerStatus.*;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class TimerService {
 
-    private final TimerRepository timerRepository;
+	private final TimerRepository timerRepository;
 
-    public TimerRestDto makeTimer(TimerRestDto timer) {
+	public CreateTimerResponse createTimer(MakeTimerRequest timer) {
 
-        TimerHub timerHub = timerRepository.findByUserId(timer.getUserId());
-        if (timerHub != null) {
-            timerHub.setTimerStatus(READY);
-            return makeTimerDto(timerHub);
-        }
+		TimerHub timerHub;
+		timerHub = timerRepository.findByUserId(timer.getUserId());
+		if (timerHub != null) {
+			timerHub.setTimerStatus(READY);
+			return CreateTimerResponse.builder().timerHub(timerHub).build();
+		}
 
-        TimerHub timerhub = TimerHub.builder()
-            .userId(timer.getUserId())
-            .startedAt(timer.getStartedAt())
-            .totalSeconds(timer.getTotalSeconds())
-            .remainedSeconds(timer.getRemainedSeconds())
-            .emoji(timer.getEmoji())
-            .timerStatus(READY)
-            .build();
+		timerHub = TimerHub.builder()
+			.userId(timer.getUserId())
+			.startedAt(timer.getStartedAt())
+			.totalSeconds(timer.getTotalSeconds())
+			.remainedSeconds(timer.getRemainedSeconds())
+			.emoji(timer.getEmoji())
+			.timerStatus(READY)
+			.build();
 
-        timerRepository.save(timerhub);
+		timerRepository.save(timerHub);
 
-        return makeTimerDto(timerHub);
-    }
+		return CreateTimerResponse.builder().timerHub(timerHub).build();
+	}
 
-    public TimerRestDto getTimerHub(long timerId) {
-        TimerHub timerHub = timerRepository.getById(timerId);
+	public GetTimerResponse getTimerHub(long timerId) {
+		TimerHub timerHub = timerRepository.getById(timerId);
+		return GetTimerResponse.builder().timerHub(timerHub).build();
+	}
 
-        return makeTimerDto(timerHub);
-    }
-
-    private TimerRestDto makeTimerDto(TimerHub timerHub) {
-        return TimerRestDto.builder()
-            .userId(timerHub.getUserId())
-            .startedAt(timerHub.getStartedAt())
-            .totalSeconds(timerHub.getTotalSeconds())
-            .remainedSeconds(timerHub.getRemainedSeconds())
-            .emoji(timerHub.getEmoji())
-            .timerStatus(timerHub.getTimerStatus()).build();
-    }
+//    public void operateTimer(OperateTimerRequest operateTimerRequest) {
+//        WebSocketTimerOperation webSocketTimerOperation = WebSocketTimerOperation.builder()
+//                .timerOperation(operateTimerRequest.getTimerOperation())
+//                .userId(operateTimerRequest.getUserId())
+//                .serverTime(operateTimerRequest.getServerTime()).build();
+//
+//        // TODO 웹소켓으로 각 서버에 요청 보내기
+//
+//        // START, RESET, PAUSE에 따라 DB의 timerHub 정보 변경하기
+//        new TimerOperator().operateTimer(webSocketTimerOperation);
+//    }
 }

@@ -1,4 +1,4 @@
-package com.gdsc.timerservice.api.dtos;
+package com.gdsc.timerservice.api.dtos.timer.request;
 
 import com.gdsc.timerservice.common.enums.Emoji;
 import com.gdsc.timerservice.common.enums.TimerStatus;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 @AllArgsConstructor
-public class TimerRestDto {
+public class MakeTimerRequest {
 
     private long userId;
 
@@ -24,7 +24,7 @@ public class TimerRestDto {
     //Milli
     private Long remainedSeconds;
 
-    private Emoji emoji;
+    private Emoji emoji; // TODO : categoryId로 변경하게 될 수도 있음
 
     private TimerStatus timerStatus;
 }
