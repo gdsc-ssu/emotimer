@@ -1,6 +1,7 @@
 package com.gdsc.timerservice.api.controller.timer;
 
 import com.gdsc.timerservice.api.dtos.timer.request.MakeTimerRequest;
+import com.gdsc.timerservice.api.dtos.timer.request.OperateTimerRequest;
 import com.gdsc.timerservice.api.dtos.timer.response.CreateTimerResponse;
 import com.gdsc.timerservice.api.dtos.timer.response.GetServerTimeResponse;
 import com.gdsc.timerservice.api.dtos.timer.response.GetTimerResponse;
@@ -37,8 +38,8 @@ public class TimerController {
 		return ResponseEntity.ok(timerService.getTimerHub(timerId));
 	}
 
-//    @PostMapping("/operate")
-//    public void operateTimer(OperateTimerRequest operateTimerRequest) {
-//        timerService.operateTimer(operateTimerRequest);
-//    }
+	@PostMapping("/operate")
+	public void operateTimer(OperateTimerRequest operateTimerRequest) {
+		timerService.operateTimer(operateTimerRequest);
+	}
 }

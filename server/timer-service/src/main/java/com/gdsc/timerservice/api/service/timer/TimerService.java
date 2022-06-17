@@ -3,10 +3,13 @@ package com.gdsc.timerservice.api.service.timer;
 import static com.gdsc.timerservice.common.enums.TimerStatus.READY;
 
 import com.gdsc.timerservice.api.dtos.timer.request.MakeTimerRequest;
+import com.gdsc.timerservice.api.dtos.timer.request.OperateTimerRequest;
 import com.gdsc.timerservice.api.dtos.timer.response.CreateTimerResponse;
 import com.gdsc.timerservice.api.dtos.timer.response.GetTimerResponse;
 import com.gdsc.timerservice.api.entity.timer.TimerHub;
 import com.gdsc.timerservice.api.repository.timer.TimerRepository;
+import com.gdsc.timerservice.websocket.WebSocketTimerOperator;
+import com.gdsc.timerservice.websocket.dto.WebSocketTimerOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TimerService {
 
 	private final TimerRepository timerRepository;
+	private final WebSocketTimerOperator webSocketTimerOperator;
 
 	public CreateTimerResponse createTimer(MakeTimerRequest timer) {
 
@@ -46,15 +50,12 @@ public class TimerService {
 		return GetTimerResponse.builder().timerHub(timerHub).build();
 	}
 
-//    public void operateTimer(OperateTimerRequest operateTimerRequest) {
-//        WebSocketTimerOperation webSocketTimerOperation = WebSocketTimerOperation.builder()
-//                .timerOperation(operateTimerRequest.getTimerOperation())
-//                .userId(operateTimerRequest.getUserId())
-//                .serverTime(operateTimerRequest.getServerTime()).build();
-//
-//        // TODO 웹소켓으로 각 서버에 요청 보내기
-//
-//        // START, RESET, PAUSE에 따라 DB의 timerHub 정보 변경하기
-//        new TimerOperator().operateTimer(webSocketTimerOperation);
-//    }
+	public void operateTimer(OperateTimerRequest operateTimerRequest) {
+		WebSocketTimerOperation webSocketTimerOperation = WebSocketTimerOperation.builder()
+			.timerOperation(operateTimerRequest.getTimerOperation())
+			.userId(operateTimerRequest.getUserId())
+			.serverTime(operateTimerRequest.getServerTime()).build();
+
+		webSocketTimerOperator.operateTimer(webSocketTimerOperation);
+	}
 }
