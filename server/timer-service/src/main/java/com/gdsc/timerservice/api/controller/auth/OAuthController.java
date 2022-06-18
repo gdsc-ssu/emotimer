@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gdsc.timerservice.api.service.OAuth2Service;
 import com.gdsc.timerservice.oauth.entity.ProviderType;
+import com.gdsc.timerservice.oauth.entity.RoleType;
+import com.gdsc.timerservice.oauth.handler.OAuth2AuthenticationSuccessHandler;
 import com.gdsc.timerservice.oauth.model.KakaoOAuthToken;
 import com.gdsc.timerservice.oauth.model.KakaoProfile;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +17,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @RequiredArgsConstructor
 public class OAuthController {
 
     private final OAuth2Service oAuth2Service;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     /**
      * 사용자의 카카오 로그인 요청 후, 로그인한 다음 리다이렉트된 경로.<br/><br/>
      * 카카오로 총 두번의 HTTP 요청으로 사용자 정보(이메일, 이름) 를 알아온다. <br/>
@@ -28,7 +33,7 @@ public class OAuthController {
      * 2. 받은 access token 을 가지고 카카오 리소스 서버에 사용자 정보 요청
      */
     @GetMapping("/callback/kakao")
-    public String codeFromKakao(@RequestParam String code, @RequestParam String state) throws JsonProcessingException {
+    public String codeFromKakao(@RequestParam String code, @RequestParam String state, HttpServletResponse response) throws JsonProcessingException {
         System.out.println("code: " + code);
 
         // 1. 받은 코드를 요청헤더 담아 카카오 서버에 액세스 토큰 요청을 보낸다 (POST 방식)
@@ -93,6 +98,17 @@ public class OAuthController {
 
         // 강제 회원가입 시작
         oAuth2Service.join(email,username, ProviderType.KAKAO);
+
+        // 액세스 토큰과 리프레시 토큰 발급해서 HttpResponse 에 담아 클라이언트 응답으로 반환
+        oAuth2Service.generateToken(response, email, RoleType.USER);
+
         return "kakao success";
     }
+
+    @GetMapping("/callback/apple")
+    public String codeFromApple(){
+
+        return null;
+    }
+
 }

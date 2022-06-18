@@ -1,6 +1,5 @@
 package com.gdsc.timerservice.oauth.info;
 
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import java.util.Map;
