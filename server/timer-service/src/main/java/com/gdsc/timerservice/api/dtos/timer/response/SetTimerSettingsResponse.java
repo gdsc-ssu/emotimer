@@ -1,6 +1,6 @@
 package com.gdsc.timerservice.api.dtos.timer.response;
 
-import com.gdsc.timerservice.api.entity.timer.TimerHub;
+import com.gdsc.timerservice.api.entity.timer.Timer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class CreateTimerResponse {
-    private TimerHub timerHub;
+public class SetTimerSettingsResponse {
+
+	private Timer timer;
 }

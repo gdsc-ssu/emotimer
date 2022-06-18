@@ -2,11 +2,11 @@ package com.gdsc.timerservice.api.service.timer;
 
 import static com.gdsc.timerservice.common.enums.TimerStatus.READY;
 
-import com.gdsc.timerservice.api.dtos.timer.request.MakeTimerRequest;
 import com.gdsc.timerservice.api.dtos.timer.request.OperateTimerRequest;
-import com.gdsc.timerservice.api.dtos.timer.response.CreateTimerResponse;
+import com.gdsc.timerservice.api.dtos.timer.request.SetTimerSettingsRequest;
 import com.gdsc.timerservice.api.dtos.timer.response.GetTimerResponse;
-import com.gdsc.timerservice.api.entity.timer.TimerHub;
+import com.gdsc.timerservice.api.dtos.timer.response.SetTimerSettingsResponse;
+import com.gdsc.timerservice.api.entity.timer.Timer;
 import com.gdsc.timerservice.api.repository.timer.TimerRepository;
 import com.gdsc.timerservice.websocket.WebSocketTimerOperator;
 import com.gdsc.timerservice.websocket.dto.WebSocketTimerOperation;
@@ -22,36 +22,32 @@ public class TimerService {
 	private final TimerRepository timerRepository;
 	private final WebSocketTimerOperator webSocketTimerOperator;
 
-	public CreateTimerResponse createTimer(MakeTimerRequest timer) {
+	public SetTimerSettingsResponse setTimerSettings(SetTimerSettingsRequest timer) {
 
-		TimerHub timerHub;
+		Timer timerHub;
 		timerHub = timerRepository.findByUserId(timer.getUserId());
 		if (timerHub != null) {
-			timerHub.setStartedAt(timer.getStartedAt());
-			timerHub.setTotalSeconds(timer.getTotalSeconds());
-			timerHub.setRemainedSeconds(timer.getRemainedSeconds());
+			timerHub.setTotalSeconds(timer.getTotalTime());
 			timerHub.setEmoji(timer.getEmoji());
 			timerHub.setTimerStatus(READY);
-			return CreateTimerResponse.builder().timerHub(timerHub).build();
+			return SetTimerSettingsResponse.builder().timer(timerHub).build();
 		}
 
-		timerHub = TimerHub.builder()
+		timerHub = Timer.builder()
 			.userId(timer.getUserId())
-			.startedAt(timer.getStartedAt())
-			.totalSeconds(timer.getTotalSeconds())
-			.remainedSeconds(timer.getRemainedSeconds())
+			.totalSeconds(timer.getTotalTime())
 			.emoji(timer.getEmoji())
 			.timerStatus(READY)
 			.build();
 
 		timerRepository.save(timerHub);
 
-		return CreateTimerResponse.builder().timerHub(timerHub).build();
+		return SetTimerSettingsResponse.builder().timer(timerHub).build();
 	}
 
-	public GetTimerResponse getTimerHub(long userId) {
-		TimerHub timerHub = timerRepository.findByUserId(userId);
-		return GetTimerResponse.builder().timerHub(timerHub).build();
+	public GetTimerResponse getTimer(long userId) {
+		Timer timer = timerRepository.findByUserId(userId);
+		return GetTimerResponse.builder().timer(timer).build();
 	}
 
 	public void operateTimer(OperateTimerRequest operateTimerRequest) {
