@@ -1,7 +1,8 @@
 package com.gdsc.timerservice.api.controller.timer;
 
-import com.gdsc.timerservice.api.dtos.timer.request.OperateTimerRequest;
+import com.gdsc.timerservice.api.dtos.timer.request.PauseTimerRequest;
 import com.gdsc.timerservice.api.dtos.timer.request.SetTimerSettingsRequest;
+import com.gdsc.timerservice.api.dtos.timer.request.StartTimerRequest;
 import com.gdsc.timerservice.api.dtos.timer.response.GetServerTimeResponse;
 import com.gdsc.timerservice.api.dtos.timer.response.GetTimerResponse;
 import com.gdsc.timerservice.api.dtos.timer.response.SetTimerSettingsResponse;
@@ -28,8 +29,9 @@ public class TimerController {
 	}
 
 	@PostMapping("/set")
-	public ResponseEntity<SetTimerSettingsResponse> setTimerSettings(SetTimerSettingsRequest req) {
-		return ResponseEntity.ok(timerService.setTimerSettings(req));
+	public ResponseEntity<SetTimerSettingsResponse> setTimerSettings(
+		SetTimerSettingsRequest setTimerSettingsRequest) {
+		return ResponseEntity.ok(timerService.setTimerSettings(setTimerSettingsRequest));
 	}
 
 	// TODO security 파트와 이야기해서 userId 추출하여 userId로 timer를 가져오는 것으로 변경하기
@@ -38,8 +40,19 @@ public class TimerController {
 		return ResponseEntity.ok(timerService.getTimer(userId));
 	}
 
-	@PostMapping("/operate")
-	public void operateTimer(OperateTimerRequest operateTimerRequest) {
-		timerService.operateTimer(operateTimerRequest);
+	@PostMapping("/start")
+	public ResponseEntity startTimer(StartTimerRequest startTimerRequest) {
+		timerService.startTimer(startTimerRequest);
+		return ResponseEntity.ok("ok");
 	}
+
+	@PostMapping("/pause")
+	public ResponseEntity pauseTimer(PauseTimerRequest pauseTimerRequest) {
+		timerService.pauseTimer(pauseTimerRequest);
+		return ResponseEntity.ok("ok");
+	}
+//	@PostMapping("/operate")
+//	public void operateTimer(OperateTimerRequest operateTimerRequest) {
+//		timerService.operateTimer(operateTimerRequest);
+//	}
 }

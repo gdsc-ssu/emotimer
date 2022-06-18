@@ -36,7 +36,7 @@ public class Timer {
 
 	//Milli
 	@Column
-	private Long totalSeconds;
+	private Long totalTime;
 
 	//Milli
 	@Column
