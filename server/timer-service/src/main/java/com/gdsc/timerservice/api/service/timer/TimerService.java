@@ -27,6 +27,10 @@ public class TimerService {
 		TimerHub timerHub;
 		timerHub = timerRepository.findByUserId(timer.getUserId());
 		if (timerHub != null) {
+			timerHub.setStartedAt(timer.getStartedAt());
+			timerHub.setTotalSeconds(timer.getTotalSeconds());
+			timerHub.setRemainedSeconds(timer.getRemainedSeconds());
+			timerHub.setEmoji(timer.getEmoji());
 			timerHub.setTimerStatus(READY);
 			return CreateTimerResponse.builder().timerHub(timerHub).build();
 		}
@@ -45,8 +49,8 @@ public class TimerService {
 		return CreateTimerResponse.builder().timerHub(timerHub).build();
 	}
 
-	public GetTimerResponse getTimerHub(long timerId) {
-		TimerHub timerHub = timerRepository.getById(timerId);
+	public GetTimerResponse getTimerHub(long userId) {
+		TimerHub timerHub = timerRepository.findByUserId(userId);
 		return GetTimerResponse.builder().timerHub(timerHub).build();
 	}
 

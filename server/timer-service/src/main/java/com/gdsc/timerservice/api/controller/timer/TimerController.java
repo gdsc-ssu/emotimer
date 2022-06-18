@@ -33,9 +33,10 @@ public class TimerController {
 	}
 
 	// TODO security 파트와 이야기해서 userId 추출하여 userId로 timer를 가져오는 것으로 변경하기
-	@GetMapping("/{timerId}")
-	public ResponseEntity<GetTimerResponse> getTimerHub(@PathVariable long timerId) {
-		return ResponseEntity.ok(timerService.getTimerHub(timerId));
+
+	@GetMapping("/{userId}")
+	public ResponseEntity<GetTimerResponse> getTimerHub(@PathVariable long userId) {
+		return ResponseEntity.ok(timerService.getTimerHub(userId));
 	}
 
 	@PostMapping("/operate")
