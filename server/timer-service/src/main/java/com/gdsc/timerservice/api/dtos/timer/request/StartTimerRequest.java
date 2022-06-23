@@ -10,6 +10,5 @@ public class StartTimerRequest {
 
 	private long userId;
 
-	// milli
-	private LocalDateTime serverTime;
+	private LocalDateTime startTime;
 }

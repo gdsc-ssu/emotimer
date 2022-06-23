@@ -34,15 +34,13 @@ public class Timer {
 	@Column
 	private LocalDateTime startedAt;
 
-	//Milli
 	@Column
-	private Long totalTime;
+	private Long totalTimeSeconds;
 
-	//Milli
 	@Column
 	private Long remainedSeconds;
 
-	//TODO 이후 Category로 변경
+	//TODO 유저 Setting 이후 Category로 변경
 	@Column
 	private Emoji emoji;
 

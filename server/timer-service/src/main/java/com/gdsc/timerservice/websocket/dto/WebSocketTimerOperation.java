@@ -17,8 +17,5 @@ public class WebSocketTimerOperation {
 
 	private LocalDateTime serverTime;
 
-	//milli
-	private long remainedSeconds;
-
 	private TimerOperation timerOperation;
 }
