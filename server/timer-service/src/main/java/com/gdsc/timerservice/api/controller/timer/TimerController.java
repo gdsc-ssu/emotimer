@@ -43,18 +43,18 @@ public class TimerController {
 	@PostMapping("/start")
 	public ResponseEntity startTimer(StartTimerRequest startTimerRequest) {
 		timerService.startTimer(startTimerRequest);
-		return ResponseEntity.ok("ok");
+		return ResponseEntity.ok("");
 	}
 
 	@PostMapping("/pause")
 	public ResponseEntity pauseTimer(PauseTimerRequest pauseTimerRequest) {
 		timerService.pauseTimer(pauseTimerRequest);
-		return ResponseEntity.ok("ok");
+		return ResponseEntity.ok("");
 	}
 
 	@PostMapping("/reset")
 	public ResponseEntity resetTimer(ResetTimerRequest resetTimerRequest) {
 		timerService.resetTimer(resetTimerRequest);
-		return ResponseEntity.ok("ok");
+		return ResponseEntity.ok("");
 	}
 }

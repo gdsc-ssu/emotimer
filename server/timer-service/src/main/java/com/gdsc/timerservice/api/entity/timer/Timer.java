@@ -26,7 +26,7 @@ public class Timer {
 	@Id
 	@GeneratedValue
 	@Column
-	private long timerId;
+	private String timerId;
 
 	@Column
 	private long userId;
@@ -42,7 +42,7 @@ public class Timer {
 
 	//TODO 유저 Setting 이후 Category로 변경
 	@Column
-	private Emoji emoji;
+	private Emoji category;
 
 	@Column
 	@Enumerated(EnumType.STRING)

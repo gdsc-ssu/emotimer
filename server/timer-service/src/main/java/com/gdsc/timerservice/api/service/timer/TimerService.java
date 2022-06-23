@@ -17,6 +17,7 @@ import com.gdsc.timerservice.websocket.dto.WebSocketTimerOperation;
 import com.gdsc.timerservice.websocket.enums.TimerOperation;
 import java.time.ZoneId;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,22 +35,31 @@ public class TimerService {
 		timerHub = timerRepository.findByUserId(timer.getUserId()).orElse(null);
 
 		if (timerHub != null) {
+			timerHub.setTimerId(UUID.randomUUID().toString());
 			timerHub.setTotalTimeSeconds(timer.getTotalTime());
-			timerHub.setEmoji(timer.getEmoji());
+			timerHub.setCategory(timer.getCategory());
 			timerHub.setTimerStatus(READY);
-			return SetTimerSettingsResponse.builder().timer(timerHub).build();
+			return SetTimerSettingsResponse.builder()
+				.startedAt(timerHub.getStartedAt())
+				.totalTimeSeconds(timerHub.getTotalTimeSeconds())
+				.remainedSeconds(timerHub.getRemainedSeconds())
+				.category(timerHub.getCategory()).build();
 		}
 
 		timerHub = Timer.builder()
 			.userId(timer.getUserId())
 			.totalTimeSeconds(timer.getTotalTime())
-			.emoji(timer.getEmoji())
+			.category(timer.getCategory())
 			.timerStatus(READY)
 			.build();
 
 		timerRepository.save(timerHub);
 
-		return SetTimerSettingsResponse.builder().timer(timerHub).build();
+		return SetTimerSettingsResponse.builder()
+			.startedAt(timerHub.getStartedAt())
+			.totalTimeSeconds(timerHub.getTotalTimeSeconds())
+			.remainedSeconds(timerHub.getRemainedSeconds())
+			.category(timerHub.getCategory()).build();
 	}
 
 	public GetTimerResponse getTimer(long userId) {

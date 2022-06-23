@@ -16,5 +16,5 @@ public class SetTimerSettingsRequest {
 
 	private long totalTime;
 
-	private Emoji emoji; // TODO : 나중에 UserSetting 파트에서 Category Enum 클래스를 만들면 그걸로 변경
+	private Emoji category; // TODO : 나중에 UserSetting 파트에서 Category Enum 클래스를 만들면 그걸로 변경
 }
