@@ -16,6 +16,7 @@ import com.gdsc.timerservice.websocket.WebSocketTimerOperator;
 import com.gdsc.timerservice.websocket.dto.WebSocketTimerOperation;
 import com.gdsc.timerservice.websocket.enums.TimerOperation;
 import java.time.ZoneId;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,12 +57,10 @@ public class TimerService {
 		return GetTimerResponse.builder().timer(timer).build();
 	}
 
-	/**
-	 * 1. Timer start, pause, reset 따로 정의하기 2. Timer start, pause reset 별로 db 데이터 변경해야함 3. Timer update함수 만들고 웹소켓으로 모든 기기들에게 전송하기
-	 */
+	//TODO TimerHistory 만들어서 저장하기
 
 	public void startTimer(StartTimerRequest startTimerRequest) {
-		Timer timer = timerRepository.findByUserId(startTimerRequest.getUserId()).orElseThrow(); // TODO 예외 처리
+		Timer timer = timerRepository.findByUserId(startTimerRequest.getUserId()).orElseThrow(() -> new NoSuchElementException()); // Custom한 Exception을 만드는 것이 나을지 고민
 		timer.setStartedAt(startTimerRequest.getStartTime());
 		timer.setTimerStatus(RUNNING);
 
@@ -74,7 +73,7 @@ public class TimerService {
 	}
 
 	public void pauseTimer(PauseTimerRequest pauseTimerRequest) {
-		Timer timer = timerRepository.findByUserId(pauseTimerRequest.getUserId()).orElseThrow(); // TODO 예외 처리
+		Timer timer = timerRepository.findByUserId(pauseTimerRequest.getUserId()).orElseThrow(() -> new NoSuchElementException()); // Custom한 Exception을 만드는 것이 나을지 고민
 		long startTimeInEpoch = timer.getStartedAt().atZone(ZoneId.systemDefault()).toEpochSecond();
 		long pausedTimeInEpoch = pauseTimerRequest.getPausedTime().atZone(ZoneId.systemDefault()).toEpochSecond();
 		long remainedSeconds = timer.getTotalTimeSeconds() - (pausedTimeInEpoch - startTimeInEpoch);
@@ -91,7 +90,7 @@ public class TimerService {
 	}
 
 	public void resetTimer(ResetTimerRequest resetTimerRequest) {
-		Timer timer = timerRepository.findByUserId(resetTimerRequest.getUserId()).orElseThrow(); // TODO 예외 처리
+		Timer timer = timerRepository.findByUserId(resetTimerRequest.getUserId()).orElseThrow(() -> new NoSuchElementException()); // Custom한 Exception을 만드는 것이 나을지 고민)
 		timer.setStartedAt(null);
 		timer.setRemainedSeconds(timer.getTotalTimeSeconds());
 		timer.setTimerStatus(READY);
@@ -102,5 +101,4 @@ public class TimerService {
 
 		webSocketTimerOperator.operateTimer(webSocketTimerOperation);
 	}
-	//TODO TimerHistory 만들어서 저장하기
 }
