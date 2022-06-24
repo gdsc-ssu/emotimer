@@ -3,13 +3,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class SettingPage extends StatelessWidget {
+class StaticsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
-      body: Text("settings"),
+      body: Center(
+        child: Text("StaticsPage"),
+      ),
     );
   }
-  
 }
