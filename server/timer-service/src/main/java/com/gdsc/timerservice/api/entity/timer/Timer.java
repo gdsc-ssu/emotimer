@@ -1,7 +1,6 @@
 package com.gdsc.timerservice.api.entity.timer;
 
 import com.gdsc.timerservice.common.enums.Emoji;
-import com.gdsc.timerservice.common.enums.TimerStatus;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,4 +46,5 @@ public class Timer {
 	@Column
 	@Enumerated(EnumType.STRING)
 	private TimerStatus timerStatus;
+
 }

@@ -1,8 +1,8 @@
 package com.gdsc.timerservice.api.service.timer;
 
-import static com.gdsc.timerservice.common.enums.TimerStatus.PAUSED;
-import static com.gdsc.timerservice.common.enums.TimerStatus.READY;
-import static com.gdsc.timerservice.common.enums.TimerStatus.RUNNING;
+import static com.gdsc.timerservice.api.entity.timer.TimerStatus.PAUSED;
+import static com.gdsc.timerservice.api.entity.timer.TimerStatus.READY;
+import static com.gdsc.timerservice.api.entity.timer.TimerStatus.RUNNING;
 
 import com.gdsc.timerservice.api.dtos.timer.request.PauseTimerRequest;
 import com.gdsc.timerservice.api.dtos.timer.request.ResetTimerRequest;
