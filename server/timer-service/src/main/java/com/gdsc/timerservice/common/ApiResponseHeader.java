@@ -2,7 +2,6 @@ package com.gdsc.timerservice.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @AllArgsConstructor
