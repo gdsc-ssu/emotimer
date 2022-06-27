@@ -1,5 +1,7 @@
 package com.gdsc.timerservice.api.entity.timer;
 
+import com.gdsc.timerservice.common.enums.Emoji;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,4 +27,25 @@ public class TimerHistory {
 
 	@Column
 	private long userId;
+
+	@Column
+	private LocalDateTime dateTime;
+
+	@Column
+	private int year;
+
+	@Column
+	private int month;
+
+	@Column
+	private int day;
+
+	@Column
+	private long totalSeconds;
+
+	@Column
+	private boolean succeed;
+
+	@Column
+	private Emoji category; // 서연님 user Settings 끝나면 Emoji -> Category로 변경
 }
