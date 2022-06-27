@@ -9,43 +9,92 @@ part 'timer-store.g.dart';
 
 class TimerStore = _TimerStore with _$TimerStore;
 
+const defaultDuration = Duration(minutes: 25);
+
 abstract class _TimerStore with Store {
-  late final Timer _timer;
+  Timer? _timer;
 
+  _TimerStore();
 
-  _TimerStore() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!pause) {
-        remainedSeconds -= 1;
-      }
-    });
-  }
-  
-  
   @observable
-  bool pause = true;
+  bool isPaused = true;
 
   @observable
   DateTime? startTime;
 
   @observable
-  int remainedSeconds = 0;
+  Duration duration = defaultDuration;
+
+  @observable
+  int remainedSeconds = defaultDuration.inSeconds;
+
+  @computed
+  String get renamedTime {
+    return Duration(seconds: remainedSeconds).toString().split(".")[0];
+  }
+
+  @computed
+  TimerStatus get status {
+    return isPaused ?
+        remainedSeconds == duration.inSeconds
+          ? TimerStatus.ready
+          : TimerStatus.paused
+        : TimerStatus.running;
+  }
+
+  @computed
+  double get percent {
+    return 1 - remainedSeconds / duration.inSeconds;
+  }
+
 
   @action
   void start(int sessionSeconds) {
-    pause = false;
+    print(remainedSeconds);
+    if( _timer != null) {
+      return;
+    }
+
+    isPaused = false;
     startTime = DateTime.now();
-    remainedSeconds = sessionSeconds;
+    duration = Duration(seconds: sessionSeconds);
+    remainedSeconds = duration.inSeconds;
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      print("TIMER: ${renamedTime}");
+      if (isPaused) {
+        return;
+      }
+
+      remainedSeconds = remainedSeconds - 1;
+      if (remainedSeconds == 0) {
+        reset();
+      }
+    });
   }
 
   @action
-  void stop() {
-    pause = true;
+  void pause() {
+    isPaused = true;
+  }
+
+  @action
+  void restart() {
+    isPaused = false;
   }
 
   @action
   void reset() {
-    pause = true;
+    isPaused = true;
     startTime = null;
+    remainedSeconds = duration.inSeconds;
+    _timer?.cancel();
+    _timer = null;
   }
+
+}
+
+enum TimerStatus {
+  running,
+  paused,
+  ready,
 }
