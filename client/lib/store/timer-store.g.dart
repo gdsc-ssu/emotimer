@@ -12,8 +12,8 @@ mixin _$TimerStore on _TimerStore, Store {
   Computed<String>? _$renamedTimeComputed;
 
   @override
-  String get renamedTime =>
-      (_$renamedTimeComputed ??= Computed<String>(() => super.renamedTime,
+  String get remainedTime =>
+      (_$renamedTimeComputed ??= Computed<String>(() => super.remainedTime,
               name: '_TimerStore.renamedTime'))
           .value;
   Computed<TimerStatus>? _$statusComputed;
@@ -147,7 +147,7 @@ isPaused: ${isPaused},
 startTime: ${startTime},
 duration: ${duration},
 remainedSeconds: ${remainedSeconds},
-renamedTime: ${renamedTime},
+renamedTime: ${remainedTime},
 status: ${status},
 percent: ${percent}
     ''';

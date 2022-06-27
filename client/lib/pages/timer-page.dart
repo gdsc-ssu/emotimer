@@ -34,7 +34,7 @@ class TimerPage extends StatelessWidget {
                           padding: const EdgeInsets.all(20),
                           children: [
                             Center(child: Text("💯", style: const TextStyle(fontSize: 24))),
-                            Center(child: Text(timerStore.renamedTime, style: const TextStyle(fontSize: 40, color: Colors.blue))),
+                            Center(child: Text(timerStore.remainedTime, style: const TextStyle(fontSize: 40, color: Colors.blue))),
                           ],
                         )),
                         footer: Padding(

@@ -29,7 +29,7 @@ abstract class _TimerStore with Store {
   int remainedSeconds = defaultDuration.inSeconds;
 
   @computed
-  String get renamedTime {
+  String get remainedTime {
     return Duration(seconds: remainedSeconds).toString().split(".")[0];
   }
 
@@ -60,7 +60,7 @@ abstract class _TimerStore with Store {
     duration = Duration(seconds: sessionSeconds);
     remainedSeconds = duration.inSeconds;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      print("TIMER: ${renamedTime}");
+      print("TIMER: ${remainedTime}");
       if (isPaused) {
         return;
       }
@@ -71,6 +71,9 @@ abstract class _TimerStore with Store {
       }
     });
   }
+
+
+
 
   @action
   void pause() {
