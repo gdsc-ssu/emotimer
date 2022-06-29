@@ -1,9 +1,9 @@
 package com.gdsc.timerservice.api.repository.timer;
 
 import com.gdsc.timerservice.api.dtos.timer.response.GetTimerStatisticsResponse;
+import com.gdsc.timerservice.api.dtos.timer.response.QTimerStatistics;
 import com.gdsc.timerservice.api.dtos.timer.response.TimerStatistics;
 import com.gdsc.timerservice.api.entity.timer.QTimerHistory;
-import com.gdsc.timerservice.api.entity.timer.TimerHistory;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -24,16 +24,14 @@ public class TimerHistoryRepositoryImplCustom implements TimerHistoryRepositoryC
 
 		GetTimerStatisticsResponse response = new GetTimerStatisticsResponse();
 
-		List<TimerHistory> timerHistories = queryFactory
-			.selectFrom(timerHistory)
+		List<TimerStatistics> timerStatisticsList = queryFactory
+			.select(new QTimerStatistics(timerHistory.category, timerHistory.totalSeconds))
 			.where(allEqual(year, month, day))
 			.orderBy(timerHistory.totalSeconds.desc())
 			.groupBy(getConditionBy(month, day))
 			.fetch();
 
-		for (TimerHistory timerHistory : timerHistories) {
-			response.getTimerStatisticsList().add(new TimerStatistics(timerHistory.getCategory(), timerHistory.getTotalSeconds()));
-		}
+		response.setTimerStatisticsList(timerStatisticsList);
 
 		return response;
 	}
