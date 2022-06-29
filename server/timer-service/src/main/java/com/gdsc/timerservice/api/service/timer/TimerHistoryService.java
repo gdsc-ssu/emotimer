@@ -1,14 +1,17 @@
 package com.gdsc.timerservice.api.service.timer;
 
-import com.gdsc.timerservice.api.dtos.timer.response.GetTimerStaticsResponse;
+import com.gdsc.timerservice.api.dtos.timer.response.GetTimerStatisticsResponse;
+import com.gdsc.timerservice.api.repository.timer.TimerHistoryRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class TimerHistoryService {
 
-	public GetTimerStaticsResponse getTimerStatics(int year, Integer momth, Integer day) {
-		// TODO 페이징 쿼리..? 보다는 sort쿼리가 맞는듯
-		return null;
+	private final TimerHistoryRepository timerHistoryRepository;
 
+	public GetTimerStatisticsResponse getTimerStatistics(int year, Integer month, Integer day) {
+		return timerHistoryRepository.getTimerStatistics(year, month, day);
 	}
 }

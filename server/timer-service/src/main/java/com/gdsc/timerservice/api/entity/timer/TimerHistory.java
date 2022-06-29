@@ -40,6 +40,7 @@ public class TimerHistory {
 	@Column
 	private int day;
 
+	// 여기서의 total seconds는 timer가 실제 동작한 시간이다.
 	@Column
 	private long totalSeconds;
 

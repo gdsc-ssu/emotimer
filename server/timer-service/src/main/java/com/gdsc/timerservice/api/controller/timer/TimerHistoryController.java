@@ -13,11 +13,11 @@ public class TimerHistoryController {
 	private final TimerHistoryService timerHistoryService;
 
 	@GetMapping
-	public void getTimerStatics(
+	public void getTimerStatistics(
 		@RequestParam(value = "year", required = true) int year,
 		@RequestParam(value = "month", required = false) Integer month,
 		@RequestParam(value = "day", required = false) Integer day
 	) {
-		timerHistoryService.getTimerStatics(year, month, day);
+		timerHistoryService.getTimerStatistics(year, month, day);
 	}
 }
