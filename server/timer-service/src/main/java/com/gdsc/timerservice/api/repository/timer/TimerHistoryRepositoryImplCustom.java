@@ -20,6 +20,7 @@ public class TimerHistoryRepositoryImplCustom implements TimerHistoryRepositoryC
 		this.queryFactory = queryFactory;
 	}
 
+	@Override
 	public GetTimerStatisticsResponse getTimerStatistics(int year, Integer month, Integer day) {
 
 		GetTimerStatisticsResponse response = new GetTimerStatisticsResponse();

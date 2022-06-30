@@ -7,7 +7,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/gdsc_timer?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
     username: root
-    password:
+    password: 111111
 
   # JPA ??
   jpa:
@@ -44,7 +44,7 @@ spring:
 
       #          kakao:
       #            client-id:
-      #            client-secret:
+    #            client-secret:
 
     # Provider ??
 #        provider:
