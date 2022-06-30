@@ -1,4 +1,4 @@
-package com.gdsc.timerservice.api.service;
+package com.gdsc.timerservice.api.service.auth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

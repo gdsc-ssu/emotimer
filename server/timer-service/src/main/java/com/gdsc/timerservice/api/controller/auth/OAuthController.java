@@ -2,11 +2,9 @@ package com.gdsc.timerservice.api.controller.auth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gdsc.timerservice.api.entity.user.User;
-import com.gdsc.timerservice.api.service.OAuth2Service;
-import com.gdsc.timerservice.oauth.entity.ProviderType;
+import com.gdsc.timerservice.api.service.auth.OAuth2Service;
 import com.gdsc.timerservice.oauth.entity.RoleType;
 import com.gdsc.timerservice.oauth.handler.OAuth2AuthenticationSuccessHandler;
-import com.gdsc.timerservice.oauth.model.AbstractProfile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
