@@ -11,12 +11,12 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class TimerHistoryRepositoryImplCustom implements TimerHistoryRepositoryCustom {
+public class TimerHistoryRepositoryImpl implements TimerHistoryRepositoryCustom {
 
 	QTimerHistory timerHistory = QTimerHistory.timerHistory;
 	private final JPAQueryFactory queryFactory;
 
-	public TimerHistoryRepositoryImplCustom(JPAQueryFactory queryFactory) {
+	public TimerHistoryRepositoryImpl(JPAQueryFactory queryFactory) {
 		this.queryFactory = queryFactory;
 	}
 

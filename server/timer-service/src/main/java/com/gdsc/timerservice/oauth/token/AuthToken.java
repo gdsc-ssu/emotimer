@@ -16,17 +16,17 @@ public class AuthToken {
 
     private static final String AUTHORITIES_KEY = "role";
 
-    AuthToken(String id, Date expiry, Key key){
+    AuthToken(String id, Date expiry, Key key) {
         this.key = key;
         this.token = createAuthToken(id, expiry);
     }
 
-    AuthToken(String email, String role, Date expiry, Key key){
+    AuthToken(String email, String role, Date expiry, Key key) {
         this.key = key;
         this.token = createAuthToken(email, role, expiry);
     }
 
-    private String createAuthToken(String email, Date expiry){
+    private String createAuthToken(String email, Date expiry) {
         return Jwts.builder()
                 .setSubject(email)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -34,7 +34,7 @@ public class AuthToken {
                 .compact();
     }
 
-    private String createAuthToken(String email, String role, Date expiry){
+    private String createAuthToken(String email, String role, Date expiry) {
         return Jwts.builder()
                 .setSubject(email)
                 .claim(AUTHORITIES_KEY, role)
@@ -47,21 +47,22 @@ public class AuthToken {
         return this.getTokenClaims() != null;
     }
 
-    public Claims getTokenClaims(){
+    public Claims getTokenClaims() {
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-        }catch (SecurityException | MalformedJwtException e){
+        } catch (SecurityException | MalformedJwtException e) {
             log.info("유효하지 않은 JWT 시그니처임.");
-        } catch (ExpiredJwtException e){
-            log.info("만료된 JWT 토큰임.");
-        }catch (UnsupportedJwtException e){
+        } catch (ExpiredJwtException e) {
+            log.info("만료된 JWT 토큰임."); // accessToken 이 만료된 경우, refresh token 을 확인하기 위해 예외를 던짐.
+            throw e;
+        } catch (UnsupportedJwtException e) {
             log.info("지원되지 않는 JWT 토큰임.");
-        }catch (IllegalArgumentException e){
-            log.info("핸들러의 jwt 토큰 압축이 잘못되었음.");
+        } catch (IllegalArgumentException e) {
+            log.info("JWT 토큰이 없음.");
         }
         return null;
     }

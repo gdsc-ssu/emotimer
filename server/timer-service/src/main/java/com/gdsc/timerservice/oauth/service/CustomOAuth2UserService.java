@@ -9,6 +9,7 @@ import com.gdsc.timerservice.oauth.exception.OAuthProviderMissMatchException;
 import com.gdsc.timerservice.oauth.info.OAuth2UserInfo;
 import com.gdsc.timerservice.oauth.info.OAuth2UserInfoFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -26,12 +27,15 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
 
     // 방금 로그인 완료한 사용자가 이미 회원가입이 되어있는 사람인지 체크. DB 뒤짐.
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        log.info("구글로부터 받은 userRequest 데이터: {}", userRequest);
+        log.info("구글로부터 받은 userRequest 데이터를 스프링 oauth 가 후처리한 뒤: {}", super.loadUser(userRequest).getAttributes());
         OAuth2User user = super.loadUser(userRequest);
 
         try{

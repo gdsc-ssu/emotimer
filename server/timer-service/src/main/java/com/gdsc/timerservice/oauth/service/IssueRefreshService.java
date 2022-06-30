@@ -1,4 +1,4 @@
-package com.gdsc.timerservice.api.controller.auth;
+package com.gdsc.timerservice.oauth.service;
 
 import com.gdsc.timerservice.api.entity.user.UserRefreshToken;
 import com.gdsc.timerservice.api.repository.user.UserRefreshTokenRepository;
@@ -11,62 +11,54 @@ import com.gdsc.timerservice.util.HeaderUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
-import java.util.List;
 
-@RestController
-@Slf4j
-@RequestMapping("/api/v1/auth")
+@Service
 @RequiredArgsConstructor
-public class AuthController {
-
+@Slf4j
+public class IssueRefreshService {
     private final AppProperties appProperties;
     private final AuthTokenProvider tokenProvider;
     private final UserRefreshTokenRepository userRefreshTokenRepository;
 
-    /**
-     * 액세스 토큰이 만료되었으면, 이 주소로 요청을 보내주세요.
-     * 액세스 토큰을 새로 발급해줍니다.
-     */
-    @GetMapping("/refresh")
-    public ApiResponse refreshToken(HttpServletRequest request, HttpServletResponse response){
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response){
         log.info("리프레시 토큰 발급 준비중...");
-        // access token 의 유효성 확인
-        String accessToken = HeaderUtil.getAccessToken(request);
-        AuthToken authToken = tokenProvider.convertAuthToken(accessToken);
-        if (!authToken.validate()){ // 유효하지 않다면 바로 response 리턴떄림
-            log.info("유효하지 않은 엑세스 토큰임");
-            ApiResponse.invalidAccessToken();
-        }
+        // access token
+//        String accessToken = HeaderUtil.getAccessToken(request);
+//        AuthToken authToken = tokenProvider.convertAuthToken(accessToken);
 
-        Claims tokenClaims = authToken.getTokenClaims();
-        String email = tokenClaims.getSubject(); // 유저 이메일
-        RoleType roleType = RoleType.of(tokenClaims.get("role", String.class)); // 유저권한
+//        if (!authToken.validate()){ // 유효하지 않다면 바로 response 리턴떄림
+//            log.info("유효하지 않은 엑세스 토큰임");
+//            ApiResponse.invalidAccessToken();
+//        }
+
+//        Claims tokenClaims = refreshAuthToken.getTokenClaims();
 
 
-        // refresh token 유효섣 확인
+
+        // refresh token 유효성 확인
         String refreshToken = HeaderUtil.getRefreshToken(request);
         AuthToken authRefreshToken = tokenProvider.convertAuthToken(refreshToken);
+        Claims tokenClaims = authRefreshToken.getTokenClaims();
+
+        String email = tokenClaims.getSubject(); // 유저 이메일
+        RoleType roleType = RoleType.of(tokenClaims.get("role", String.class)); // 유저권한
         if (!authRefreshToken.validate()){
             log.info("유효하지 않은 리프레시 토큰임.");
-            return ApiResponse.invalidRefreshToken(); // 유효하지 않다면 바로 response 리턴때림
+            return;
+//            return ApiResponse.invalidRefreshToken(); // 유효하지 않다면 바로 response 리턴때림
         }
 
         // email 과 refresh token 으로 DB 확인. 있다면 새로운 토큰 생성하여 응답
         UserRefreshToken userRefreshToken = userRefreshTokenRepository.findByEmailAndRefreshToken(email, refreshToken);
         if (userRefreshToken == null){
             log.info("해당하는 리프레시 토큰이 DB에 존재하지 않음");
-            return ApiResponse.invalidRefreshToken();
+            return;
+//            return ApiResponse.invalidRefreshToken();
         }
         Date now = new Date();
         // 새로운 토큰 생성
@@ -77,9 +69,7 @@ public class AuthController {
 
         response.setHeader("access_token" , newAccessToken.getToken());
         log.info("새로운 액세스 토큰 헤더에 탑재 완료!");
-        return ApiResponse.success("access_token", newAccessToken.getToken());
+//        return ApiResponse.success("access_token", newAccessToken.getToken());
 
     }
-
-
 }

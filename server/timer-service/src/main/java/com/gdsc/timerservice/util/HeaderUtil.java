@@ -18,4 +18,8 @@ public class HeaderUtil {
 
         return null;
     }
+
+    public static String getRefreshToken(HttpServletRequest request){
+        return request.getHeader("refresh_token");
+    }
 }

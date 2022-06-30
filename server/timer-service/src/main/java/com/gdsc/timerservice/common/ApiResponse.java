@@ -38,9 +38,9 @@ public class ApiResponse<T> {
         return new ApiResponse(new ApiResponseHeader(FAILED, INVALID_ACCESS_TOKEN), null);
     }
 
-//    public static <T> ApiResponse<T> invalidRefreshToken(){
-//        return new ApiResponse(new ApiResponseHeader())
-//    }
+    public static <T> ApiResponse<T> invalidRefreshToken(){
+        return new ApiResponse(new ApiResponseHeader(FAILED, INVALID_REFRESH_TOKEN), null);
+    }
 
 
 
