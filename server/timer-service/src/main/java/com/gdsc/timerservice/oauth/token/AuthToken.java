@@ -1,44 +1,41 @@
 package com.gdsc.timerservice.oauth.token;
 
+import com.gdsc.timerservice.config.properties.AppProperties;
+import com.gdsc.timerservice.oauth.entity.RoleType;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import java.security.Key;
+import org.springframework.context.annotation.Configuration;
+
 import java.util.Date;
 
 @Slf4j
-@RequiredArgsConstructor
+@NoArgsConstructor
+@Configuration
 public class AuthToken {
     @Getter
-    private final String token;
-    private final Key key;
+    private  String token;
 
     private static final String AUTHORITIES_KEY = "role";
 
-    AuthToken(String id, Date expiry, Key key) {
-        this.key = key;
-        this.token = createAuthToken(id, expiry);
+    private  AppProperties appProperties; //
+
+    AuthToken(Long id, String email, Date expiry) {
+        this.token = createAuthToken(id, email, RoleType.USER,expiry);
+    }
+    AuthToken(String token) {
+        this.token = token;
     }
 
-    AuthToken(String email, String role, Date expiry, Key key) {
-        this.key = key;
-        this.token = createAuthToken(email, role, expiry);
-    }
-
-    private String createAuthToken(String email, Date expiry) {
+    private String createAuthToken(Long id, String email, RoleType role, Date expiry) {
+        Claims claims = Jwts.claims().setSubject(email);
+        claims.put("id", id);
+        claims.put("role", role);
         return Jwts.builder()
-                .setSubject(email)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .setExpiration(expiry)
-                .compact();
-    }
-
-    private String createAuthToken(String email, String role, Date expiry) {
-        return Jwts.builder()
-                .setSubject(email)
-                .claim(AUTHORITIES_KEY, role)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .setClaims(claims)
+                .signWith(Keys.hmacShaKeyFor(appProperties.getAuth().getTokenSecret().getBytes()), SignatureAlgorithm.HS256)
                 .setExpiration(expiry)
                 .compact();
     }
@@ -50,7 +47,7 @@ public class AuthToken {
     public Claims getTokenClaims() {
         try {
             return Jwts.parserBuilder()
-                    .setSigningKey(key)
+                    .setSigningKey(Keys.hmacShaKeyFor(appProperties.getAuth().getTokenSecret().getBytes()))
                     .build()
                     .parseClaimsJws(token)
                     .getBody();

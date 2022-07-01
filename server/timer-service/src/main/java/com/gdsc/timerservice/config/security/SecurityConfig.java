@@ -9,6 +9,7 @@ import com.gdsc.timerservice.oauth.handler.OAuth2AuthenticationSuccessHandler;
 import com.gdsc.timerservice.oauth.service.CustomOAuth2UserService;
 import com.gdsc.timerservice.oauth.service.IssueRefreshService;
 import com.gdsc.timerservice.oauth.token.AuthTokenProvider;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.security.Key;
 
 @RequiredArgsConstructor
 @EnableWebSecurity(debug = true) // Spring Security 설정을 활성화
@@ -57,6 +60,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }
+
+//    @Bean
+//    public Key generateKey() {
+//        return Keys.hmacShaKeyFor(appProperties.getAuth().getTokenSecret().getBytes());
+//    }
 
     /**
      * 토큰 필터 설정

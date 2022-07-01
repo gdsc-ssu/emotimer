@@ -3,12 +3,17 @@ package com.gdsc.timerservice.oauth.token;
 import com.gdsc.timerservice.oauth.exception.TokenValidFailedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.security.Keys;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Arrays;
@@ -17,25 +22,25 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Component
+@RequiredArgsConstructor
 public class AuthTokenProvider {
-    private final Key key;
+//    private final Key key;
     private static final String AUTHORITIES_KEY = "role";
 
-    public AuthTokenProvider(String secret){
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
-    }
+
 
     // refresh token 용 생성자
-    public AuthToken createAuthToken(String email, Date expiry){
-        return new AuthToken(email, expiry, key);
-    }
+//    public AuthToken createAuthToken(Long id, String email){
+//        return new AuthToken(id, email);
+//    }
 
     // access token 용 생성자
-    public AuthToken createAuthToken(String email, String role, Date expiry){
-        return new AuthToken(email, role, expiry, key);
+    public AuthToken createAuthToken(Long id, String email, Date expiry){
+        return new AuthToken(id, email,expiry);
     }
     public AuthToken convertAuthToken(String token){
-        return new AuthToken(token, key);
+        return new AuthToken(token);
     }
 
     public Authentication getAuthentication(AuthToken authToken){

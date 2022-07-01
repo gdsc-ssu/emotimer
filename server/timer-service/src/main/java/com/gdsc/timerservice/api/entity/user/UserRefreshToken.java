@@ -19,6 +19,10 @@ public class UserRefreshToken {
     @Column(name = "REFRESH_TOKEN_SEQ")
     private Long refreshTokenSeq;
 
+    @Column(name = "ID")
+    @NotNull
+    private Long id;
+
     @Column(name = "EMAIL", unique = true)
     @NotNull
     private String email;
@@ -27,7 +31,8 @@ public class UserRefreshToken {
     @NotNull
     private String refreshToken;
 
-    public UserRefreshToken(@NotNull String email, @NotNull String refreshToken){
+    public UserRefreshToken(@NotNull Long id, @NotNull String email, @NotNull String refreshToken){
+        this.id = id;
         this.email = email;
         this.refreshToken = refreshToken;
     }

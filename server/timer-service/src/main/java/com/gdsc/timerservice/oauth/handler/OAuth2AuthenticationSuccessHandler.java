@@ -88,20 +88,21 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         // access token 생성
         Date now = new Date();
-        AuthToken accessToken = tokenProvider.createAuthToken(user.getEmail(), roleType.getCode(), new Date(now.getTime() + appProperties.getAuth().getTokenExpiry()));
+        AuthToken accessToken = tokenProvider.createAuthToken(user.getUserId(), user.getEmail(), new Date(now.getTime() + appProperties.getAuth().getTokenExpiry()));
 
         // refresh token 생성
         long refreshTokenExpiry = appProperties.getAuth().getRefreshTokenExpiry();
-        AuthToken refreshToken = tokenProvider.createAuthToken(user.getEmail(), new Date(now.getTime() + refreshTokenExpiry));
+        AuthToken refreshToken = tokenProvider.createAuthToken(user.getUserId(), user.getEmail(), new Date(now.getTime() + refreshTokenExpiry));
 
         // refresh token DB 에 저장
-        UserRefreshToken userRefreshToken = userRefreshTokenRepository.findByEmail(user.getEmail());
+        Optional<UserRefreshToken> userRefreshToken = userRefreshTokenRepository.findById(user.getUserId());
 
-        if (userRefreshToken != null){ // 기존에 리프레시 토큰이 있었다면, 새롭게 생성한 refresh token 으로 덮어쓰기.
-            userRefreshToken.setRefreshToken(refreshToken.getToken());
+        if (userRefreshToken.isPresent()){ // 기존에 리프레시 토큰이 있었다면, 새롭게 생성한 refresh token 으로 덮어쓰기.
+            UserRefreshToken token = userRefreshToken.get();
+            token.setRefreshToken(refreshToken.getToken());
         } else { // 기존에 리프레시 토큰을 한번도 발급받지 않은 유저, 즉 현재 처음으로 소셜로그인하는 경우, refresh token 신규 저장.
-            userRefreshToken = new UserRefreshToken(user.getEmail(), refreshToken.getToken());
-            userRefreshTokenRepository.saveAndFlush(userRefreshToken);
+            UserRefreshToken newToken = new UserRefreshToken(userRefreshToken.get().getId(), user.getEmail(), refreshToken.getToken());
+            userRefreshTokenRepository.saveAndFlush(newToken);
         }
         response.setHeader("access_token" , accessToken.getToken());
         response.setHeader("refresh_token", refreshToken.getToken());

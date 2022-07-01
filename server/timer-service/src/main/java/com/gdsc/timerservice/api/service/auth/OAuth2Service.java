@@ -24,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -51,7 +52,7 @@ public class OAuth2Service {
         if (existingUser != null) { // 이미 가입된 유저(이메일)라면
             if (profile.getProviderType() != existingUser.getProviderType()) { // 이미 가입된 유저(이메일)인데 다른 소셜벤더로 로그인한 경우
                 throw new OAuthProviderMissMatchException(
-                        "이전에 " + profile.getProviderType() + " 계정으로 로그인하셨던 적이 있습니다." + profile.getProviderType() + " 로그인으로 로그인하시겠습니까?"
+                        "이전에 " + profile.getEmail() + " 계정으로 로그인하셨던 적이 있습니다."
                 );
             }
 
@@ -84,23 +85,25 @@ public class OAuth2Service {
     }
 
     // 토큰 생성
-    public void generateToken(HttpServletResponse response, String email, RoleType kakao) {
+    public void generateToken(HttpServletResponse response, Long id, String email, RoleType kakao) {
         // access token 생성
         Date now = new Date();
-        AuthToken accessToken = tokenProvider.createAuthToken(email, String.valueOf(kakao), new Date(now.getTime() + appProperties.getAuth().getTokenExpiry()));
+        AuthToken accessToken = tokenProvider.createAuthToken(id, email, new Date(now.getTime() + appProperties.getAuth().getTokenExpiry()));
 
         // refresh token 생성
         long refreshTokenExpiry = appProperties.getAuth().getRefreshTokenExpiry();
-        AuthToken refreshToken = tokenProvider.createAuthToken(email, new Date(now.getTime() + refreshTokenExpiry));
+        AuthToken refreshToken = tokenProvider.createAuthToken(id, email, new Date(now.getTime() + refreshTokenExpiry));
 
         // refresh token DB 에 저장
-        UserRefreshToken userRefreshToken = userRefreshTokenRepository.findByEmail(email);
+        Optional<UserRefreshToken> userRefreshToken = userRefreshTokenRepository.findById(id);
 
-        if (userRefreshToken != null) { // 기존에 리프레시 토큰이 있었다면, 새롭게 생성한 refresh token 으로 덮어쓰기.
-            userRefreshToken.setRefreshToken(refreshToken.getToken());
+        UserRefreshToken token = userRefreshToken.get();
+
+        if (userRefreshToken.isPresent()) { // 기존에 리프레시 토큰이 있었다면, 새롭게 생성한 refresh token 으로 덮어쓰기.
+            token.setRefreshToken(refreshToken.getToken());
         } else { // 기존에 리프레시 토큰을 한번도 발급받지 않은 유저, 즉 현재 처음으로 소셜로그인하는 경우, refresh token 신규 저장.
-            userRefreshToken = new UserRefreshToken(email, refreshToken.getToken());
-            userRefreshTokenRepository.saveAndFlush(userRefreshToken);
+            token = new UserRefreshToken(id, email, refreshToken.getToken());
+            userRefreshTokenRepository.saveAndFlush(token);
         }
         response.setHeader("access_token", accessToken.getToken());
         response.setHeader("refresh_token", refreshToken.getToken());

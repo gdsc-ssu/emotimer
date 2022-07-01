@@ -53,8 +53,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             issueRefreshService.refreshToken(request, response);
             // throw new AccessTokenExpiredException(); // 예외를 여기서 터뜨리면, 사용자 화면에 바로 에러 스택이 보이게 됨.
         }
-        log.info("이후 필터를 타는가?");
-        // 이후 나머지 필터를 타게 하자~
+
         filterChain.doFilter(request, response);
     }
 

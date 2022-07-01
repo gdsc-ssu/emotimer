@@ -2,7 +2,6 @@ package com.gdsc.timerservice.oauth.service;
 
 import com.gdsc.timerservice.api.entity.user.UserRefreshToken;
 import com.gdsc.timerservice.api.repository.user.UserRefreshTokenRepository;
-import com.gdsc.timerservice.common.ApiResponse;
 import com.gdsc.timerservice.config.properties.AppProperties;
 import com.gdsc.timerservice.oauth.entity.RoleType;
 import com.gdsc.timerservice.oauth.token.AuthToken;
@@ -54,7 +53,7 @@ public class IssueRefreshService {
         }
 
         // email 과 refresh token 으로 DB 확인. 있다면 새로운 토큰 생성하여 응답
-        UserRefreshToken userRefreshToken = userRefreshTokenRepository.findByEmailAndRefreshToken(email, refreshToken);
+        UserRefreshToken userRefreshToken = userRefreshTokenRepository.findByIdAndRefreshToken((Long) tokenClaims.get("id"), refreshToken);
         if (userRefreshToken == null){
             log.info("해당하는 리프레시 토큰이 DB에 존재하지 않음");
             return;
@@ -62,9 +61,8 @@ public class IssueRefreshService {
         }
         Date now = new Date();
         // 새로운 토큰 생성
-        AuthToken newAccessToken = tokenProvider.createAuthToken(
+        AuthToken newAccessToken = tokenProvider.createAuthToken(1L,
                 email,
-                roleType.getCode(),
                 new Date(now.getTime() + appProperties.getAuth().getTokenExpiry()));
 
         response.setHeader("access_token" , newAccessToken.getToken());
