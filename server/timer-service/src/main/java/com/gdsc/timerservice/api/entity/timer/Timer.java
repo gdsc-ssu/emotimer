@@ -6,7 +6,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,12 +22,11 @@ import lombok.Setter;
 public class Timer {
 
 	@Id
-	@GeneratedValue
 	@Column
 	private String timerId;
 
 	@Column
-	private long userId;
+	private String userId;
 
 	@Column
 	private LocalDateTime startedAt;
@@ -41,6 +39,7 @@ public class Timer {
 
 	//TODO 유저 Setting 이후 Category로 변경
 	@Column
+	@Enumerated(EnumType.STRING)
 	private Emoji category;
 
 	@Column

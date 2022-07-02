@@ -21,14 +21,16 @@ public class TimerHistoryService {
 	public void createTimerHistory(CreateTimerHistoryRequest createTimerHistoryRequest) {
 		LocalDateTime now = LocalDateTime.now();
 
-		TimerHistory.builder()
+		TimerHistory timerHistory = TimerHistory.builder()
 			.userId(createTimerHistoryRequest.getUserId())
 			.dateTime(now)
 			.year(now.getYear())
 			.month(now.getMonth().getValue())
 			.day(now.getDayOfMonth())
-			.totalSeconds(createTimerHistoryRequest.getTotalSeconds())
+			.spentSeconds(createTimerHistoryRequest.getSpentTime())
 			.succeed(createTimerHistoryRequest.isSucceed())
-			.category(createTimerHistoryRequest.getCategory());
+			.category(createTimerHistoryRequest.getCategory()).build();
+
+		timerHistoryRepository.save(timerHistory);
 	}
 }

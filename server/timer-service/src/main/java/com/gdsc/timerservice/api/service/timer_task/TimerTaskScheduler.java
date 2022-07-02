@@ -1,10 +1,14 @@
 package com.gdsc.timerservice.api.service.timer_task;
 
+import static com.gdsc.timerservice.api.entity.timer.TimerStatus.FINISHED;
+
 import com.gdsc.timerservice.api.dtos.timerhistory.request.CreateTimerHistoryRequest;
+import com.gdsc.timerservice.api.repository.timer.TimerRepository;
 import com.gdsc.timerservice.api.service.timer.TimerHistoryService;
 import com.gdsc.timerservice.api.service.timer_task.dto.CreateTimerTaskRequest;
-import com.gdsc.timerservice.websocket.WebSocketTimerOperator;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Timer;
 import java.util.TimerTask;
 import lombok.RequiredArgsConstructor;
@@ -14,31 +18,45 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TimerTaskScheduler {
 
-	private WebSocketTimerOperator webSocketTimerOperator;
+	private final TimerHistoryService timerHistoryService;
 
-	private TimerHistoryService timerHistoryService;
+	private final TimerRepository timerRepository;
 
-	private Map<Long, TimerTask> timerTasks;
+	private Map<String, TimerTask> timerTasks = new HashMap<>();
 
-	public void createTimerTask(CreateTimerTaskRequest createTimerTaskRequest) {
+	//Entity의 timer 아님. Java에서 제공하는 Util
+	private Timer timer = new Timer();
 
-		Timer timer = new Timer();
+	public void createSuccessTimerTask(CreateTimerTaskRequest createTimerTaskRequest) {
+
 		TimerTask timerTask = new TimerTask() {
 			@Override
 			public void run() {
 				CreateTimerHistoryRequest createTimerHistoryRequest = CreateTimerHistoryRequest.builder()
 					.userId(createTimerTaskRequest.getUserId())
-					.totalSeconds(createTimerTaskRequest.getRemainedSeconds())
+					.spentTime(createTimerTaskRequest.getTotalTimeSeconds())
 					.succeed(true)
 					.category(createTimerTaskRequest.getCategory()).build();
 
 				timerHistoryService.createTimerHistory(createTimerHistoryRequest);
+
+				com.gdsc.timerservice.api.entity.timer.Timer timer = timerRepository.findByUserId(createTimerTaskRequest.getUserId()).orElseThrow(() -> new NoSuchElementException());
+				timer.setTimerStatus(FINISHED);
+				timerRepository.save(timer);
+
+				timerTasks.remove(createTimerTaskRequest.getUserId());
 			}
 		};
+
 		timer.schedule(timerTask, createTimerTaskRequest.getRemainedSeconds() * 1000);
+		timerTasks.put(createTimerTaskRequest.getUserId(), timerTask);
 	}
 
-	public void deleteTimerTask(long userId) {
+	public void deleteTimerTask(String userId) {
+		TimerTask timerTask = timerTasks.get(userId);
+		if (timerTask != null) {
+			timerTask.cancel();
+		}
 		timerTasks.remove(userId);
 	}
 }

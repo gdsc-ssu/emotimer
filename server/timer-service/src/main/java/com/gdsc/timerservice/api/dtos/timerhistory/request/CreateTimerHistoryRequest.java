@@ -8,13 +8,7 @@ import lombok.Data;
 @Builder
 public class CreateTimerHistoryRequest {
 
-	private long userId;
-
-	@Deprecated
-	private long totalSeconds;
-
-	@Deprecated
-	private long remainedSeconds;
+	private String userId;
 
 	private long spentTime;
 

@@ -1,9 +1,10 @@
 package com.gdsc.timerservice.api.repository.timer;
 
+import static com.gdsc.timerservice.api.entity.timer.QTimerHistory.timerHistory;
+
 import com.gdsc.timerservice.api.dtos.timer.response.GetTimerStatisticsResponse;
 import com.gdsc.timerservice.api.dtos.timer.response.QTimerStatistics;
 import com.gdsc.timerservice.api.dtos.timer.response.TimerStatistics;
-import com.gdsc.timerservice.api.entity.timer.QTimerHistory;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class TimerHistoryRepositoryImpl implements TimerHistoryRepositoryCustom {
 
-	QTimerHistory timerHistory = QTimerHistory.timerHistory;
 	private final JPAQueryFactory queryFactory;
 
 	public TimerHistoryRepositoryImpl(JPAQueryFactory queryFactory) {
@@ -26,9 +26,9 @@ public class TimerHistoryRepositoryImpl implements TimerHistoryRepositoryCustom 
 		GetTimerStatisticsResponse response = new GetTimerStatisticsResponse();
 
 		List<TimerStatistics> timerStatisticsList = queryFactory
-			.select(new QTimerStatistics(timerHistory.category, timerHistory.totalSeconds))
+			.select(new QTimerStatistics(timerHistory.category, timerHistory.spentSeconds))
 			.where(allEqual(year, month, day))
-			.orderBy(timerHistory.totalSeconds.desc())
+			.orderBy(timerHistory.spentSeconds.desc())
 			.groupBy(getConditionBy(month, day))
 			.fetch();
 

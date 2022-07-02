@@ -1,6 +1,5 @@
 package com.gdsc.timerservice.api.dtos.timer.request;
 
-import com.gdsc.timerservice.common.enums.Emoji;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,11 +8,7 @@ import lombok.Setter;
 @Setter
 public class StartTimerRequest {
 
-	private long userId;
-
-	private long totalTime;
-
-	private Emoji categorty;
+	private String userId;
 
 	private LocalDateTime startTime;
 }

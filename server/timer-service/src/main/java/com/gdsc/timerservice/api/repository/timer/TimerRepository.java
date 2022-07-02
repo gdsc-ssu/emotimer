@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TimerRepository extends JpaRepository<Timer, Long> {
 
-	Optional<Timer> findByUserId(long userId);
+	Optional<Timer> findByUserId(String userId);
 }

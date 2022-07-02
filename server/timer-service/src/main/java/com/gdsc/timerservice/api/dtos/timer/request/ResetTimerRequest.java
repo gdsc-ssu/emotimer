@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class ResetTimerRequest {
 
-	private long userId;
+	private String userId;
 
 	private long remainedSeconds;
 }
