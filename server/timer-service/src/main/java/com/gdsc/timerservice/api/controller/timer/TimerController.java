@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/timer")
+@RequestMapping("/v1/timer")
 @RequiredArgsConstructor
 public class TimerController {
 
 	private final TimerService timerService;
 
-	@GetMapping
+	@GetMapping("/server-time")
 	public ResponseEntity<GetServerTimeResponse> getServerTime() {
 		return ResponseEntity.ok(GetServerTimeResponse.builder().now(LocalDateTime.now()).build());
 	}
