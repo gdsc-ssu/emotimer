@@ -12,9 +12,13 @@ import javax.validation.constraints.NotNull;
 public class UserRefreshToken {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "USER_ID")
+    private User user;
 
     @Column(name = "EMAIL", unique = true)
     @NotNull

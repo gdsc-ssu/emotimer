@@ -5,13 +5,16 @@ import com.gdsc.timerservice.api.entity.user.User;
 import com.gdsc.timerservice.api.service.auth.OAuth2Service;
 import com.gdsc.timerservice.oauth.entity.RoleType;
 import com.gdsc.timerservice.oauth.handler.OAuth2AuthenticationSuccessHandler;
+import com.gdsc.timerservice.oauth.service.IssueRefreshService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
@@ -20,6 +23,7 @@ import java.io.IOException;
 public class OAuthController {
 
     private final OAuth2Service oAuth2Service;
+    private final IssueRefreshService issueRefreshService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
     /**
@@ -37,6 +41,12 @@ public class OAuthController {
         User user = oAuth2Service.socialJoin(code, vendor);
         // 액세스 토큰과 리프레시 토큰 발급해서 HttpResponse 에 담아 클라이언트 응답으로 반환
         oAuth2Service.generateToken(response,user.getUserId() , user.getEmail(), RoleType.USER);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/refresh")
+    public ResponseEntity refresh(HttpServletRequest request, HttpServletResponse response) {
+        issueRefreshService.refreshToken(request, response);
         return ResponseEntity.ok().build();
     }
 

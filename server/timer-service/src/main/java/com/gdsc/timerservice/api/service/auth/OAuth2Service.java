@@ -12,16 +12,19 @@ import com.gdsc.timerservice.oauth.exception.OAuthProviderMissMatchException;
 import com.gdsc.timerservice.oauth.model.AbstractOAuthToken;
 import com.gdsc.timerservice.oauth.model.AbstractProfile;
 import com.gdsc.timerservice.oauth.model.OAuthVendor;
+import com.gdsc.timerservice.oauth.model.TokenResponse;
 import com.gdsc.timerservice.oauth.token.AuthToken;
 import com.gdsc.timerservice.oauth.token.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
@@ -31,7 +34,7 @@ import java.util.UUID;
 public class OAuth2Service {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
 
     private final UserRepository userRepository;
@@ -87,11 +90,13 @@ public class OAuth2Service {
     public void generateToken(HttpServletResponse response, Long id, String email, RoleType kakao) throws IOException {
         // access token 생성
         Date now = new Date();
-        AuthToken accessToken = tokenProvider.createAuthToken(id, email, new Date(now.getTime() + appProperties.getAuth().getTokenExpiry()));
+        Date accessExpiry = new Date(now.getTime() + appProperties.getAuth().getTokenExpiry());
+        AuthToken accessToken = tokenProvider.createAuthToken(id, email, accessExpiry);
 
         // refresh token 생성
         long refreshTokenExpiry = appProperties.getAuth().getRefreshTokenExpiry();
-        AuthToken refreshToken = tokenProvider.createAuthToken(id, email, new Date(now.getTime() + refreshTokenExpiry));
+        Date refreshExpiry = new Date(now.getTime() + refreshTokenExpiry);
+        AuthToken refreshToken = tokenProvider.createAuthToken(id, email, refreshExpiry);
 
         userRefreshTokenRepository.findById(id)
                 .ifPresentOrElse(findToken -> {
@@ -99,10 +104,11 @@ public class OAuth2Service {
                 }, () -> {
                     userRefreshTokenRepository.saveNewRefreshToken(id, email, refreshToken.getToken());
                 });
-        response.setHeader("access_token", accessToken.getToken());
-        response.setHeader("refresh_token", refreshToken.getToken());
-        response.sendRedirect("/");
-
+        response.setStatus(HttpServletResponse.SC_OK); // 200
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        TokenResponse tokenResponse = new TokenResponse(accessToken.getToken(), refreshToken.getToken());
+        response.getWriter().write(objectMapper.writeValueAsString(tokenResponse));
     }
 
     public AbstractProfile getProfile(String code, String vendor) throws JsonProcessingException {

@@ -32,44 +32,11 @@ spring:
     cache: false # thymeleaf 에 대한 캐시를 남기지 않음
     prefix: classpath:/templates/
     suffix: .html
-  # Security OAuth
-#  security:
-#    oauth2:
-#      client:
-#        registration:
-#          google:
-#            client-id: 29116814846-j83hn3f2rtr42ug43b941sid7f65c6ii.apps.googleusercontent.com
-#            client-secret: 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
-#            scope:
-#              - email
-#              - profile
 
-#          kakao:
-#            client-id:
-#            client-secret:
-
-       # Provider ??
-#        provider:
-#          kakao:
-#            authorizationUri: https://kauth.kakao.com/oauth/authorize
-#            tokenUri: https://kauth.kakao.com/oauth/token
-#            userInfoUri: https://kapi.kakao.com/v2/user/me
-#            userNameAttribute: id
-
-# cors ?? -> SecurityConfig.java ??
-
-# jwt secret key ??
-#jwt:
-#  secret: 'gdsc-timer-hello-world-banana-ice-cream-oreo-chocolate-lol'
-
-# ?? ?? secret key ? Redirect Uri ??
 app:
   auth:
     tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
-    tokenExpiry: 1800000 # 60000(1분) # 1800000 # 30분 1000(1초) * 60 * 30
+    tokenExpiry: 10 # 60000(1분) # 1800000 # 30분 1000(1초) * 60 * 30
     refreshTokenExpiry: 604800000 # 리프레시토큰의 유효기간은 7일
 
-#  oauth2:
-#    authorizedRedirectUris:
-#      - http://localhost:3000/oauth/redirect
 

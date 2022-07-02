@@ -53,8 +53,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // URL 별 권한 관리. authorizeRequests 가 선언되어야만 antMatchers 옵션을 사용할 수 있음.
         http.authorizeRequests()
-                .antMatchers("/api/**/user/**").hasAnyAuthority(RoleType.USER.getCode()) // "/api/**" USER 권한이 있어야 접근가능.
-                .antMatchers("/api/**/admin/**").hasAnyAuthority(RoleType.ADMIN.getCode()) // "/api/**/admin/**" ADMIN 권한이 있어야 접근가능.
+                .antMatchers("/api/**").hasAnyAuthority(RoleType.USER.getCode()) // "/api/**" USER 권한이 있어야 접근가능.
+                .antMatchers("/admin/api/**").hasAnyAuthority(RoleType.ADMIN.getCode()) // "/admin/api/**" ADMIN 권한이 있어야 접근가능.
                 .anyRequest().permitAll(); // 위 경로를 제외한 나머지 모든 요청은 접근 허용. .anyRequest.authenticated() 로 한다면 우리 서버로의 모든 접근은 "인증"된 사용자만 들어올 수 있게 됨.
 
         http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

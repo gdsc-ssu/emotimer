@@ -41,18 +41,13 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         if (tokenStr!= null) {
             AuthToken token = tokenProvider.convertAuthToken(tokenStr);
 
-            // 리프레시 토큰
-            String refreshTokenStr = HeaderUtil.getAccessToken(request);
-            AuthToken refreshToken = tokenProvider.convertAuthToken(refreshTokenStr);
-            // 토큰이 유효하다면 시큐리티 컨텍스트 홀더에 현재 인증객체 저장.
             try {
                 if (token!= null && token.validate()) {
                     setAuthentication(token);
                 }
             } catch (ExpiredJwtException e) {
                 log.info("토큰 만료됨");
-                issueRefreshService.refreshToken(request, response);
-                // throw new AccessTokenExpiredException(); // 예외를 여기서 터뜨리면, 사용자 화면에 바로 에러 스택이 보이게 됨.
+                response.setStatus(401);
             }
         }
 
