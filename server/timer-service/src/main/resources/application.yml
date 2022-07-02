@@ -16,7 +16,7 @@ spring:
   jpa:
     generate-ddl: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
@@ -36,7 +36,7 @@ spring:
 app:
   auth:
     tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
-    tokenExpiry: 10 # 60000(1분) # 1800000 # 30분 1000(1초) * 60 * 30
+    tokenExpiry: 1800000 # 60000(1분) # 1800000 # 30분 1000(1초) * 60 * 30
     refreshTokenExpiry: 604800000 # 리프레시토큰의 유효기간은 7일
 
 

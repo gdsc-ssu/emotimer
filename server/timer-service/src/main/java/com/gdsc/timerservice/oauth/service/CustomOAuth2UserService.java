@@ -1,7 +1,9 @@
 package com.gdsc.timerservice.oauth.service;
 
 import com.gdsc.timerservice.api.entity.user.User;
+import com.gdsc.timerservice.api.entity.user.UserSetting;
 import com.gdsc.timerservice.api.repository.user.UserRepository;
+import com.gdsc.timerservice.api.repository.user.UserSettingRepository;
 import com.gdsc.timerservice.oauth.entity.ProviderType;
 import com.gdsc.timerservice.oauth.entity.RoleType;
 import com.gdsc.timerservice.oauth.entity.UserPrincipal;
@@ -29,13 +31,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+
     private final UserRepository userRepository;
+    private final UserSettingRepository userSettingRepository;
 
     // 방금 로그인 완료한 사용자가 이미 회원가입이 되어있는 사람인지 체크. DB 뒤짐.
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        log.info("구글로부터 받은 userRequest 데이터: {}", userRequest);
-        log.info("구글로부터 받은 userRequest 데이터를 스프링 oauth 가 후처리한 뒤: {}", super.loadUser(userRequest).getAttributes());
         OAuth2User user = super.loadUser(userRequest);
 
         try{
@@ -80,8 +82,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+        User savedUser = userRepository.saveAndFlush(user);
+        // default 유저 세팅 저장
+        UserSetting userSetting = UserSetting.builder()
+                .user(user)
+                .timerDuration(25)
+                .restDuration(5)
+                .restAutoStart(false)
+                .build();
+        userSettingRepository.saveAndFlush(userSetting);
 
-        return userRepository.saveAndFlush(user); // DB 에 유저 저장.
+        return savedUser;
     }
 
     // 기존 유저. 업데이트 된거 있으면 업뎃.

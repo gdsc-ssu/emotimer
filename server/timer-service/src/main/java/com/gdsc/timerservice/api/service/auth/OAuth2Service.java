@@ -3,8 +3,10 @@ package com.gdsc.timerservice.api.service.auth;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gdsc.timerservice.api.entity.user.User;
+import com.gdsc.timerservice.api.entity.user.UserSetting;
 import com.gdsc.timerservice.api.repository.user.UserRefreshTokenRepository;
 import com.gdsc.timerservice.api.repository.user.UserRepository;
+import com.gdsc.timerservice.api.repository.user.UserSettingRepository;
 import com.gdsc.timerservice.config.properties.AppProperties;
 import com.gdsc.timerservice.oauth.entity.ProviderType;
 import com.gdsc.timerservice.oauth.entity.RoleType;
@@ -38,6 +40,7 @@ public class OAuth2Service {
 
 
     private final UserRepository userRepository;
+    private final UserSettingRepository userSettingRepository;
     private final AuthTokenProvider tokenProvider;
     private final AppProperties appProperties;
     private final UserRefreshTokenRepository userRefreshTokenRepository;
@@ -78,7 +81,18 @@ public class OAuth2Service {
                 .roleType(RoleType.USER)
                 .build();
 
-        return userRepository.save(user);
+        User savedUser = userRepository.saveAndFlush(user);
+        // default 유저 세팅 저장
+        UserSetting userSetting = UserSetting.builder()
+                .user(user)
+                .timerDuration(25)
+                .restDuration(5)
+                .restAutoStart(false)
+                .build();
+
+        userSettingRepository.saveAndFlush(userSetting);
+
+        return savedUser;
     }
 
     private User updateOAuthInfo(String email, User user) {
