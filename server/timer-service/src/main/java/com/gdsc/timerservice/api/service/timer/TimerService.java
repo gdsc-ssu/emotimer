@@ -6,12 +6,14 @@ import static com.gdsc.timerservice.api.entity.timer.TimerStatus.RUNNING;
 
 import com.gdsc.timerservice.api.dtos.timer.request.PauseTimerRequest;
 import com.gdsc.timerservice.api.dtos.timer.request.ResetTimerRequest;
+import com.gdsc.timerservice.api.dtos.timer.request.ResumeTimerRequest;
 import com.gdsc.timerservice.api.dtos.timer.request.SetTimerSettingsRequest;
 import com.gdsc.timerservice.api.dtos.timer.request.StartTimerRequest;
 import com.gdsc.timerservice.api.dtos.timer.response.GetTimerResponse;
 import com.gdsc.timerservice.api.dtos.timer.response.SetTimerSettingsResponse;
 import com.gdsc.timerservice.api.entity.timer.Timer;
 import com.gdsc.timerservice.api.repository.timer.TimerRepository;
+import com.gdsc.timerservice.api.service.timer_task.TimerTaskScheduler;
 import com.gdsc.timerservice.websocket.WebSocketTimerOperator;
 import com.gdsc.timerservice.websocket.dto.WebSocketTimerOperation;
 import com.gdsc.timerservice.websocket.enums.TimerOperation;
@@ -29,6 +31,8 @@ public class TimerService {
 
 	private final TimerRepository timerRepository;
 	private final WebSocketTimerOperator webSocketTimerOperator;
+
+	private final TimerTaskScheduler timerTaskScheduler;
 
 	public SetTimerSettingsResponse setTimerSettings(SetTimerSettingsRequest timer) {
 		Timer timerHub;
@@ -67,8 +71,6 @@ public class TimerService {
 		return GetTimerResponse.builder().timer(timer).build();
 	}
 
-	//TODO TimerHistory 만들어서 저장하기
-
 	public void startTimer(StartTimerRequest startTimerRequest) {
 		Timer timer = timerRepository.findByUserId(startTimerRequest.getUserId()).orElseThrow(() -> new NoSuchElementException()); // Custom한 Exception을 만드는 것이 나을지 고민
 		timer.setStartedAt(startTimerRequest.getStartTime());
@@ -99,6 +101,13 @@ public class TimerService {
 		webSocketTimerOperator.operateTimer(webSocketTimerOperation);
 	}
 
+	public void resumeTimer(ResumeTimerRequest resumeTimerRequest) {
+		WebSocketTimerOperation webSocketTimerOperation = WebSocketTimerOperation.builder()
+			.timerOperation(TimerOperation.RESUME)
+			.userId(resumeTimerRequest.getUserId())
+			.serverTime(resumeTimerRequest.getResumeTime()).build();
+	}
+
 	public void resetTimer(ResetTimerRequest resetTimerRequest) {
 		Timer timer = timerRepository.findByUserId(resetTimerRequest.getUserId()).orElseThrow(() -> new NoSuchElementException()); // Custom한 Exception을 만드는 것이 나을지 고민)
 		timer.setStartedAt(null);
@@ -110,5 +119,7 @@ public class TimerService {
 			.userId(resetTimerRequest.getUserId()).build();
 
 		webSocketTimerOperator.operateTimer(webSocketTimerOperation);
+
+		timerTaskScheduler.deleteTimerTask(resetTimerRequest.getUserId());
 	}
 }

@@ -2,6 +2,7 @@ package com.gdsc.timerservice.api.controller.timer;
 
 import com.gdsc.timerservice.api.dtos.timer.request.PauseTimerRequest;
 import com.gdsc.timerservice.api.dtos.timer.request.ResetTimerRequest;
+import com.gdsc.timerservice.api.dtos.timer.request.ResumeTimerRequest;
 import com.gdsc.timerservice.api.dtos.timer.request.SetTimerSettingsRequest;
 import com.gdsc.timerservice.api.dtos.timer.request.StartTimerRequest;
 import com.gdsc.timerservice.api.dtos.timer.response.GetServerTimeResponse;
@@ -49,6 +50,12 @@ public class TimerController {
 	@PostMapping("/pause")
 	public ResponseEntity pauseTimer(PauseTimerRequest pauseTimerRequest) {
 		timerService.pauseTimer(pauseTimerRequest);
+		return ResponseEntity.ok("");
+	}
+
+	@PostMapping("/resume")
+	public ResponseEntity resumeTimer(ResumeTimerRequest resumeTimerRequest) {
+		timerService.resumeTimer(resumeTimerRequest);
 		return ResponseEntity.ok("");
 	}
 
