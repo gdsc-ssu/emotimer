@@ -3,7 +3,6 @@ package com.gdsc.timerservice.api.service.auth;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gdsc.timerservice.api.entity.user.User;
-import com.gdsc.timerservice.api.entity.user.UserRefreshToken;
 import com.gdsc.timerservice.api.repository.user.UserRefreshTokenRepository;
 import com.gdsc.timerservice.api.repository.user.UserRepository;
 import com.gdsc.timerservice.config.properties.AppProperties;
@@ -22,9 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -85,7 +84,7 @@ public class OAuth2Service {
     }
 
     // 토큰 생성
-    public void generateToken(HttpServletResponse response, Long id, String email, RoleType kakao) {
+    public void generateToken(HttpServletResponse response, Long id, String email, RoleType kakao) throws IOException {
         // access token 생성
         Date now = new Date();
         AuthToken accessToken = tokenProvider.createAuthToken(id, email, new Date(now.getTime() + appProperties.getAuth().getTokenExpiry()));
@@ -94,19 +93,15 @@ public class OAuth2Service {
         long refreshTokenExpiry = appProperties.getAuth().getRefreshTokenExpiry();
         AuthToken refreshToken = tokenProvider.createAuthToken(id, email, new Date(now.getTime() + refreshTokenExpiry));
 
-        // refresh token DB 에 저장
-        Optional<UserRefreshToken> userRefreshToken = userRefreshTokenRepository.findById(id);
-
-        UserRefreshToken token = userRefreshToken.get();
-
-        if (userRefreshToken.isPresent()) { // 기존에 리프레시 토큰이 있었다면, 새롭게 생성한 refresh token 으로 덮어쓰기.
-            token.setRefreshToken(refreshToken.getToken());
-        } else { // 기존에 리프레시 토큰을 한번도 발급받지 않은 유저, 즉 현재 처음으로 소셜로그인하는 경우, refresh token 신규 저장.
-            token = new UserRefreshToken(id, email, refreshToken.getToken());
-            userRefreshTokenRepository.saveAndFlush(token);
-        }
+        userRefreshTokenRepository.findById(id)
+                .ifPresentOrElse(findToken -> {
+                    findToken.setRefreshToken(refreshToken.getToken());
+                }, () -> {
+                    userRefreshTokenRepository.saveNewRefreshToken(id, email, refreshToken.getToken());
+                });
         response.setHeader("access_token", accessToken.getToken());
         response.setHeader("refresh_token", refreshToken.getToken());
+        response.sendRedirect("/");
 
     }
 

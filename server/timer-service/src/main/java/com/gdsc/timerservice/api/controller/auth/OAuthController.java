@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class OAuthController {
     @GetMapping("/callback/{vendor}")
     public ResponseEntity codeFromKakao(@RequestParam String code,
                                         @PathVariable String vendor,
-                                        HttpServletResponse response) throws JsonProcessingException {
+                                        HttpServletResponse response) throws IOException {
         // 강제 회원가입 시작
         User user = oAuth2Service.socialJoin(code, vendor);
         // 액세스 토큰과 리프레시 토큰 발급해서 HttpResponse 에 담아 클라이언트 응답으로 반환

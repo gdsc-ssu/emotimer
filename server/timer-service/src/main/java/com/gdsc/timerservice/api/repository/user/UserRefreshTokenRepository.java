@@ -8,4 +8,8 @@ import org.springframework.stereotype.Repository;
 public interface UserRefreshTokenRepository extends JpaRepository<UserRefreshToken, Long> {
     UserRefreshToken findByIdAndRefreshToken(Long id, String refreshToken);
 
+    default void saveNewRefreshToken(Long id, String email, String refreshToken) {
+        saveAndFlush(new UserRefreshToken(id, email, refreshToken));
+    }
+
 }

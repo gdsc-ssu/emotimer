@@ -5,29 +5,42 @@ import com.gdsc.timerservice.oauth.entity.RoleType;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.Date;
 
 @Slf4j
-@NoArgsConstructor
-@Configuration
+@Getter
 public class AuthToken {
-    @Getter
-    private  String token;
+    private String token;
 
-    private static final String AUTHORITIES_KEY = "role";
+    private final AppProperties appProperties;
 
-    private  AppProperties appProperties; //
+    //AuthToken(Long id, String email, Date expiry) {
+    //    this.token = createAuthToken(id, email, RoleType.USER, expiry);
+    //    this.appProperties = appProperties;
+    //}
 
-    AuthToken(Long id, String email, Date expiry) {
-        this.token = createAuthToken(id, email, RoleType.USER,expiry);
+//    AuthToken(String token) {
+//        this.token = token;
+//    }
+
+    public AuthToken(AppProperties appProperties) {
+        this.appProperties = appProperties;
     }
-    AuthToken(String token) {
-        this.token = token;
+
+    public static AuthToken createNewOne(AppProperties appProperties, String token) {
+        AuthToken authToken = new AuthToken(appProperties);
+        authToken.token = token;
+        return authToken;
     }
+
+    public AuthToken(AppProperties appProperties, Long id, String email, Date expiry) {
+        this.appProperties = appProperties;
+        this.token = createAuthToken(id, email, RoleType.USER, expiry);
+    }
+
 
     private String createAuthToken(Long id, String email, RoleType role, Date expiry) {
         Claims claims = Jwts.claims().setSubject(email);
