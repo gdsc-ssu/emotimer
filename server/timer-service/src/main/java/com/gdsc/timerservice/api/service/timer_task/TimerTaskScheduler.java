@@ -2,7 +2,7 @@ package com.gdsc.timerservice.api.service.timer_task;
 
 import com.gdsc.timerservice.api.dtos.timerhistory.request.CreateTimerHistoryRequest;
 import com.gdsc.timerservice.api.service.timer.TimerHistoryService;
-import com.gdsc.timerservice.api.service.timer_task.dto.CreateTimerTask;
+import com.gdsc.timerservice.api.service.timer_task.dto.CreateTimerTaskRequest;
 import com.gdsc.timerservice.websocket.WebSocketTimerOperator;
 import java.util.Map;
 import java.util.Timer;
@@ -20,22 +20,22 @@ public class TimerTaskScheduler {
 
 	private Map<Long, TimerTask> timerTasks;
 
-	public void createTimerTask(CreateTimerTask createTimerTask) {
+	public void createTimerTask(CreateTimerTaskRequest createTimerTaskRequest) {
 
 		Timer timer = new Timer();
 		TimerTask timerTask = new TimerTask() {
 			@Override
 			public void run() {
 				CreateTimerHistoryRequest createTimerHistoryRequest = CreateTimerHistoryRequest.builder()
-					.userId(createTimerTask.getUserId())
-					.totalSeconds(createTimerTask.getRemainedSeconds())
+					.userId(createTimerTaskRequest.getUserId())
+					.totalSeconds(createTimerTaskRequest.getRemainedSeconds())
 					.succeed(true)
-					.category(createTimerTask.getCategory()).build();
+					.category(createTimerTaskRequest.getCategory()).build();
 
 				timerHistoryService.createTimerHistory(createTimerHistoryRequest);
 			}
 		};
-		timer.schedule(timerTask, createTimerTask.getRemainedSeconds() * 1000);
+		timer.schedule(timerTask, createTimerTaskRequest.getRemainedSeconds() * 1000);
 	}
 
 	public void deleteTimerTask(long userId) {

@@ -10,9 +10,13 @@ public class CreateTimerHistoryRequest {
 
 	private long userId;
 
+	@Deprecated
 	private long totalSeconds;
 
+	@Deprecated
 	private long remainedSeconds;
+
+	private long spentTime;
 
 	private boolean succeed;
 

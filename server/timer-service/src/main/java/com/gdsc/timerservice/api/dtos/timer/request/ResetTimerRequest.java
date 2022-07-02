@@ -8,4 +8,6 @@ import lombok.Setter;
 public class ResetTimerRequest {
 
 	private long userId;
+
+	private long remainedSeconds;
 }

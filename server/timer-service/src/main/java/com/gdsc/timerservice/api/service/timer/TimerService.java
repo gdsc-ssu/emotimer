@@ -11,9 +11,11 @@ import com.gdsc.timerservice.api.dtos.timer.request.SetTimerSettingsRequest;
 import com.gdsc.timerservice.api.dtos.timer.request.StartTimerRequest;
 import com.gdsc.timerservice.api.dtos.timer.response.GetTimerResponse;
 import com.gdsc.timerservice.api.dtos.timer.response.SetTimerSettingsResponse;
+import com.gdsc.timerservice.api.dtos.timerhistory.request.CreateTimerHistoryRequest;
 import com.gdsc.timerservice.api.entity.timer.Timer;
 import com.gdsc.timerservice.api.repository.timer.TimerRepository;
 import com.gdsc.timerservice.api.service.timer_task.TimerTaskScheduler;
+import com.gdsc.timerservice.api.service.timer_task.dto.CreateTimerTaskRequest;
 import com.gdsc.timerservice.websocket.WebSocketTimerOperator;
 import com.gdsc.timerservice.websocket.dto.WebSocketTimerOperation;
 import com.gdsc.timerservice.websocket.enums.TimerOperation;
@@ -33,6 +35,8 @@ public class TimerService {
 	private final WebSocketTimerOperator webSocketTimerOperator;
 
 	private final TimerTaskScheduler timerTaskScheduler;
+
+	private final TimerHistoryService timerHistoryService;
 
 	public SetTimerSettingsResponse setTimerSettings(SetTimerSettingsRequest timer) {
 		Timer timerHub;
@@ -82,6 +86,13 @@ public class TimerService {
 			.serverTime(startTimerRequest.getStartTime()).build();
 
 		webSocketTimerOperator.operateTimer(webSocketTimerOperation);
+
+		CreateTimerTaskRequest createTimerTaskRequest = CreateTimerTaskRequest.builder()
+			.userId(startTimerRequest.getUserId())
+			.remainedSeconds(startTimerRequest.getTotalTime())
+			.category(startTimerRequest.getCategorty()).build();
+
+		timerTaskScheduler.createTimerTask(createTimerTaskRequest);
 	}
 
 	public void pauseTimer(PauseTimerRequest pauseTimerRequest) {
@@ -99,6 +110,8 @@ public class TimerService {
 			.serverTime(pauseTimerRequest.getPausedTime()).build();
 
 		webSocketTimerOperator.operateTimer(webSocketTimerOperation);
+
+		timerTaskScheduler.deleteTimerTask(pauseTimerRequest.getUserId());
 	}
 
 	public void resumeTimer(ResumeTimerRequest resumeTimerRequest) {
@@ -106,6 +119,15 @@ public class TimerService {
 			.timerOperation(TimerOperation.RESUME)
 			.userId(resumeTimerRequest.getUserId())
 			.serverTime(resumeTimerRequest.getResumeTime()).build();
+
+		webSocketTimerOperator.operateTimer(webSocketTimerOperation);
+
+		CreateTimerTaskRequest createTimerTaskRequest = CreateTimerTaskRequest.builder()
+			.userId(resumeTimerRequest.getUserId())
+			.remainedSeconds(resumeTimerRequest.getRemainedTime())
+			.category(resumeTimerRequest.getCategory()).build();
+
+		timerTaskScheduler.createTimerTask(createTimerTaskRequest);
 	}
 
 	public void resetTimer(ResetTimerRequest resetTimerRequest) {
@@ -121,5 +143,13 @@ public class TimerService {
 		webSocketTimerOperator.operateTimer(webSocketTimerOperation);
 
 		timerTaskScheduler.deleteTimerTask(resetTimerRequest.getUserId());
+
+		CreateTimerHistoryRequest createTimerHistoryRequest = CreateTimerHistoryRequest.builder()
+			.userId(resetTimerRequest.getUserId())
+			.spentTime(timer.getTotalTimeSeconds() - resetTimerRequest.getRemainedSeconds())
+			.succeed(false)
+			.category(timer.getCategory()).build();
+
+		timerHistoryService.createTimerHistory(createTimerHistoryRequest);
 	}
 }
