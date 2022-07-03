@@ -8,7 +8,7 @@ import 'package:gdsc_timer/pages/timer-page.dart';
 final Map<String, WidgetBuilder> routes = {
   '/': (context) => MainPage(),
   '/login': (context) => LoginPage(),
-  '/setting': (context) => SettingPage(),
+  '/setting': (context) => SettingsPage(),
   '/statics': (context) => StaticsPage(),
   '/timer': (context) => TimerPage()
 };

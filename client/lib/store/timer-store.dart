@@ -60,7 +60,7 @@ abstract class _TimerStore with Store {
     duration = Duration(seconds: sessionSeconds);
     remainedSeconds = duration.inSeconds;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      print("TIMER: ${remainedTime}");
+      print("TIMER: $remainedTime, paused: $isPaused");
       if (isPaused) {
         return;
       }
