@@ -14,8 +14,8 @@ public class TimerHistoryService {
 
 	private final TimerHistoryRepository timerHistoryRepository;
 
-	public GetTimerStatisticsResponse getTimerStatistics(int year, Integer month, Integer day) {
-		return timerHistoryRepository.getTimerStatistics(year, month, day);
+	public GetTimerStatisticsResponse getTimerStatistics(String userId, int year, Integer month, Integer day) {
+		return timerHistoryRepository.getTimerStatistics(userId, year, month, day);
 	}
 
 	public void createTimerHistory(CreateTimerHistoryRequest createTimerHistoryRequest) {

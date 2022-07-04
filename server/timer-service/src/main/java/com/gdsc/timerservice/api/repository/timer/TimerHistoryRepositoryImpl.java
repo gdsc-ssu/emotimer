@@ -6,7 +6,6 @@ import com.gdsc.timerservice.api.dtos.timer.response.GetTimerStatisticsResponse;
 import com.gdsc.timerservice.api.dtos.timer.response.QTimerStatistics;
 import com.gdsc.timerservice.api.dtos.timer.response.TimerStatistics;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Expression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import org.springframework.stereotype.Repository;
@@ -21,19 +20,19 @@ public class TimerHistoryRepositoryImpl implements TimerHistoryRepositoryCustom 
 	}
 
 	@Override
-	public GetTimerStatisticsResponse getTimerStatistics(int year, Integer month, Integer day) {
+	public GetTimerStatisticsResponse getTimerStatistics(String userId, int year, Integer month, Integer day) {
 
 		GetTimerStatisticsResponse response = new GetTimerStatisticsResponse();
 
 		List<TimerStatistics> timerStatisticsList = queryFactory
-			.select(new QTimerStatistics(timerHistory.category, timerHistory.spentSeconds))
-			.where(allEqual(year, month, day))
-			.orderBy(timerHistory.spentSeconds.desc())
-			.groupBy(getConditionBy(month, day))
+			.select(new QTimerStatistics(timerHistory.category, timerHistory.spentSeconds.sum()))
+			.from(timerHistory)
+			.where(allEqual(year, month, day).and(timerHistory.userId.eq(userId)))
+			.groupBy(timerHistory.category)
+			.orderBy(timerHistory.spentSeconds.sum().desc())
 			.fetch();
 
 		response.setTimerStatisticsList(timerStatisticsList);
-
 		return response;
 	}
 
@@ -57,16 +56,5 @@ public class TimerHistoryRepositoryImpl implements TimerHistoryRepositoryCustom 
 			return new BooleanBuilder();
 		}
 		return new BooleanBuilder(timerHistory.day.eq(day));
-	}
-
-	// 더 좋은 방법은 없을까....
-	private Expression<?>[] getConditionBy(Integer month, Integer day) {
-		if (month == null && day == null) {
-			return new Expression[]{timerHistory.year};
-		}
-		if (month != null && day == null) {
-			return new Expression[]{timerHistory.year, timerHistory.month};
-		}
-		return new Expression[]{timerHistory.year, timerHistory.month, timerHistory.day};
 	}
 }

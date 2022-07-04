@@ -4,5 +4,5 @@ import com.gdsc.timerservice.api.dtos.timer.response.GetTimerStatisticsResponse;
 
 public interface TimerHistoryRepositoryCustom {
 
-	GetTimerStatisticsResponse getTimerStatistics(int year, Integer month, Integer day);
+	GetTimerStatisticsResponse getTimerStatistics(String userId, int year, Integer month, Integer day);
 }
