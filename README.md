@@ -1,5 +1,7 @@
 # Project. Timer
 
+- 프로젝트 개요 : 웹소켓을 이용한 다중기기 동시 타이머
+
 ## Commmon
  
 ### Domain dictionary 
