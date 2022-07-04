@@ -1,4 +1,5 @@
 spring:
+
   profiles:
     active: local
     include: oauth # application-xxx.properties 파일을 만들면 xxx 라는 프로파일이 생성된다. oauth 프로파일을 include 하겠다.
@@ -9,11 +10,13 @@ spring:
     username: root
     password: 111111
 
+
+
   # JPA ??
   jpa:
     generate-ddl: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
@@ -30,23 +33,23 @@ spring:
     cache: false # thymeleaf 에 대한 캐시를 남기지 않음
     prefix: classpath:/templates/
     suffix: .html
-      # Security OAuth
-      #  security:
-      #    oauth2:
-      #      client:
-      #        registration:
-      #          google:
-      #            client-id: 29116814846-j83hn3f2rtr42ug43b941sid7f65c6ii.apps.googleusercontent.com
-      #            client-secret: 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
-      #            scope:
-      #              - email
-    #              - profile
+# Security OAuth
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          google:
+#            client-id: 29116814846-j83hn3f2rtr42ug43b941sid7f65c6ii.apps.googleusercontent.com
+#            client-secret: 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
+#            scope:
+#              - email
+#              - profile
 
-    #          kakao:
-    #            client-id:
-    #            client-secret:
+#          kakao:
+#            client-id:
+#            client-secret:
 
-    # Provider ??
+# Provider ??
 #        provider:
 #          kakao:
 #            authorizationUri: https://kauth.kakao.com/oauth/authorize
@@ -59,15 +62,10 @@ spring:
 # jwt secret key ??
 #jwt:
 #  secret: 'gdsc-timer-hello-world-banana-ice-cream-oreo-chocolate-lol'
-
-# ?? ?? secret key ? Redirect Uri ??
 app:
   auth:
     tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
-    tokenExpiry: 1800000 # 60000(1분) # 1800000 # 30분 1000(1초) * 60 * 30
+    tokenExpiry: 10 # 60000(1분) # 1800000 # 30분 1000(1초) * 60 * 30
     refreshTokenExpiry: 604800000 # 리프레시토큰의 유효기간은 7일
 
-#  oauth2:
-#    authorizedRedirectUris:
-#      - http://localhost:3000/oauth/redirect
 

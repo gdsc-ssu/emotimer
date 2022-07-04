@@ -1,23 +1,24 @@
 package com.gdsc.timerservice.api.entity.user;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
 @Table(name = "USER_REFRESH_TOKEN")
+@Builder @Setter @Getter
+@NoArgsConstructor @AllArgsConstructor
 public class UserRefreshToken {
 
     @Id
-    @GeneratedValue
-    @Column(name = "REFRESH_TOKEN_SEQ")
-    private Long refreshTokenSeq;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "USER_ID")
+    private User user;
 
     @Column(name = "EMAIL", unique = true)
     @NotNull
@@ -27,9 +28,5 @@ public class UserRefreshToken {
     @NotNull
     private String refreshToken;
 
-    public UserRefreshToken(@NotNull String email, @NotNull String refreshToken){
-        this.email = email;
-        this.refreshToken = refreshToken;
-    }
 
 }

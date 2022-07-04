@@ -1,9 +1,8 @@
-package com.gdsc.timerservice.api.service;
+package com.gdsc.timerservice.api.service.auth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gdsc.timerservice.api.entity.user.User;
-import com.gdsc.timerservice.api.entity.user.UserRefreshToken;
 import com.gdsc.timerservice.api.repository.user.UserRefreshTokenRepository;
 import com.gdsc.timerservice.api.repository.user.UserRepository;
 import com.gdsc.timerservice.config.properties.AppProperties;
@@ -13,15 +12,19 @@ import com.gdsc.timerservice.oauth.exception.OAuthProviderMissMatchException;
 import com.gdsc.timerservice.oauth.model.AbstractOAuthToken;
 import com.gdsc.timerservice.oauth.model.AbstractProfile;
 import com.gdsc.timerservice.oauth.model.OAuthVendor;
+import com.gdsc.timerservice.oauth.model.TokenResponse;
 import com.gdsc.timerservice.oauth.token.AuthToken;
 import com.gdsc.timerservice.oauth.token.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
@@ -31,7 +34,7 @@ import java.util.UUID;
 public class OAuth2Service {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
 
     private final UserRepository userRepository;
@@ -51,7 +54,7 @@ public class OAuth2Service {
         if (existingUser != null) { // 이미 가입된 유저(이메일)라면
             if (profile.getProviderType() != existingUser.getProviderType()) { // 이미 가입된 유저(이메일)인데 다른 소셜벤더로 로그인한 경우
                 throw new OAuthProviderMissMatchException(
-                        "이전에 " + profile.getProviderType() + " 계정으로 로그인하셨던 적이 있습니다." + profile.getProviderType() + " 로그인으로 로그인하시겠습니까?"
+                        "이전에 " + profile.getEmail() + " 계정으로 로그인하셨던 적이 있습니다."
                 );
             }
 
@@ -84,27 +87,28 @@ public class OAuth2Service {
     }
 
     // 토큰 생성
-    public void generateToken(HttpServletResponse response, String email, RoleType kakao) {
+    public void generateToken(HttpServletResponse response, Long id, String email, RoleType kakao) throws IOException {
         // access token 생성
         Date now = new Date();
-        AuthToken accessToken = tokenProvider.createAuthToken(email, String.valueOf(kakao), new Date(now.getTime() + appProperties.getAuth().getTokenExpiry()));
+        Date accessExpiry = new Date(now.getTime() + appProperties.getAuth().getTokenExpiry());
+        AuthToken accessToken = tokenProvider.createAuthToken(id, email, accessExpiry);
 
         // refresh token 생성
         long refreshTokenExpiry = appProperties.getAuth().getRefreshTokenExpiry();
-        AuthToken refreshToken = tokenProvider.createAuthToken(email, new Date(now.getTime() + refreshTokenExpiry));
+        Date refreshExpiry = new Date(now.getTime() + refreshTokenExpiry);
+        AuthToken refreshToken = tokenProvider.createAuthToken(id, email, refreshExpiry);
 
-        // refresh token DB 에 저장
-        UserRefreshToken userRefreshToken = userRefreshTokenRepository.findByEmail(email);
-
-        if (userRefreshToken != null) { // 기존에 리프레시 토큰이 있었다면, 새롭게 생성한 refresh token 으로 덮어쓰기.
-            userRefreshToken.setRefreshToken(refreshToken.getToken());
-        } else { // 기존에 리프레시 토큰을 한번도 발급받지 않은 유저, 즉 현재 처음으로 소셜로그인하는 경우, refresh token 신규 저장.
-            userRefreshToken = new UserRefreshToken(email, refreshToken.getToken());
-            userRefreshTokenRepository.saveAndFlush(userRefreshToken);
-        }
-        response.setHeader("access_token", accessToken.getToken());
-        response.setHeader("refresh_token", refreshToken.getToken());
-
+        userRefreshTokenRepository.findById(id)
+                .ifPresentOrElse(findToken -> {
+                    findToken.setRefreshToken(refreshToken.getToken());
+                }, () -> {
+                    userRefreshTokenRepository.saveNewRefreshToken(id, email, refreshToken.getToken());
+                });
+        response.setStatus(HttpServletResponse.SC_OK); // 200
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        TokenResponse tokenResponse = new TokenResponse(accessToken.getToken(), refreshToken.getToken());
+        response.getWriter().write(objectMapper.writeValueAsString(tokenResponse));
     }
 
     public AbstractProfile getProfile(String code, String vendor) throws JsonProcessingException {

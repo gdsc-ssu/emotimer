@@ -2,25 +2,28 @@ package com.gdsc.timerservice.api.controller.auth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.gdsc.timerservice.api.entity.user.User;
-import com.gdsc.timerservice.api.service.OAuth2Service;
-import com.gdsc.timerservice.oauth.entity.ProviderType;
+import com.gdsc.timerservice.api.service.auth.OAuth2Service;
 import com.gdsc.timerservice.oauth.entity.RoleType;
 import com.gdsc.timerservice.oauth.handler.OAuth2AuthenticationSuccessHandler;
-import com.gdsc.timerservice.oauth.model.AbstractProfile;
+import com.gdsc.timerservice.oauth.service.IssueRefreshService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
 public class OAuthController {
 
-
     private final OAuth2Service oAuth2Service;
+    private final IssueRefreshService issueRefreshService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
     /**
@@ -31,20 +34,21 @@ public class OAuthController {
      * 2. 받은 access token 을 가지고 카카오 리소스 서버에 사용자 정보 요청
      */
     @GetMapping("/callback/{vendor}")
-    public String codeFromKakao(@RequestParam String code,
-                                @PathVariable String vendor,
-                                HttpServletResponse response) throws JsonProcessingException {
+    public ResponseEntity codeFromKakao(@RequestParam String code,
+                                        @PathVariable String vendor,
+                                        HttpServletResponse response) throws IOException {
         // 강제 회원가입 시작
         User user = oAuth2Service.socialJoin(code, vendor);
         // 액세스 토큰과 리프레시 토큰 발급해서 HttpResponse 에 담아 클라이언트 응답으로 반환
-        oAuth2Service.generateToken(response, user.getEmail(), RoleType.USER);
-        return "kakao success";
+        oAuth2Service.generateToken(response,user.getUserId() , user.getEmail(), RoleType.USER);
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/callback/apple")
-    public String codeFromApple() {
-
-        return null;
+    @GetMapping("/refresh")
+    public ResponseEntity refresh(HttpServletRequest request, HttpServletResponse response) {
+        issueRefreshService.refreshToken(request, response);
+        return ResponseEntity.ok().build();
     }
+
 
 }

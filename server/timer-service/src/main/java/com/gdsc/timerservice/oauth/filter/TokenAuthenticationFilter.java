@@ -37,24 +37,21 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain) throws ServletException, IOException {
         // 액세스 토큰
         String tokenStr = HeaderUtil.getAccessToken(request);
-        AuthToken token = tokenProvider.convertAuthToken(tokenStr);
 
-        // 리프레시 토큰
-        String refreshTokenStr = HeaderUtil.getAccessToken(request);
-        AuthToken refreshToken = tokenProvider.convertAuthToken(refreshTokenStr);
+        if (tokenStr!= null) {
+            AuthToken token = tokenProvider.convertAuthToken(tokenStr);
 
-        // 토큰이 유효하다면 시큐리티 컨텍스트 홀더에 현재 인증객체 저장.
-        try {
-            if (token.validate()) {
-                setAuthentication(token);
+            try {
+                if (token!= null && token.validate()) {
+                    setAuthentication(token);
+                }
+            } catch (ExpiredJwtException e) {
+                log.info("토큰 만료됨");
+                response.setStatus(401);
             }
-        } catch (ExpiredJwtException e) {
-            log.info("토큰 만료됨");
-            issueRefreshService.refreshToken(request, response);
-            // throw new AccessTokenExpiredException(); // 예외를 여기서 터뜨리면, 사용자 화면에 바로 에러 스택이 보이게 됨.
         }
-        log.info("이후 필터를 타는가?");
-        // 이후 나머지 필터를 타게 하자~
+
+
         filterChain.doFilter(request, response);
     }
 

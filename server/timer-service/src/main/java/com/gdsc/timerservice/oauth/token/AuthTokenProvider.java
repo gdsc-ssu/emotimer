@@ -1,45 +1,39 @@
 package com.gdsc.timerservice.oauth.token;
 
+import com.gdsc.timerservice.config.properties.AppProperties;
 import com.gdsc.timerservice.oauth.exception.TokenValidFailedException;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.stereotype.Component;
 
-import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Component
+@RequiredArgsConstructor
 public class AuthTokenProvider {
-    private final Key key;
     private static final String AUTHORITIES_KEY = "role";
+    private final AppProperties appProperties;
 
-    public AuthTokenProvider(String secret){
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+    public AuthToken createAuthToken(Long id, String email, Date expiry) {
+        return new AuthToken(appProperties, id, email, expiry);
     }
 
-    // refresh token 용 생성자
-    public AuthToken createAuthToken(String email, Date expiry){
-        return new AuthToken(email, expiry, key);
+    public AuthToken convertAuthToken(String token) {
+        return AuthToken.createNewOne(appProperties, token);
     }
 
-    // access token 용 생성자
-    public AuthToken createAuthToken(String email, String role, Date expiry){
-        return new AuthToken(email, role, expiry, key);
-    }
-    public AuthToken convertAuthToken(String token){
-        return new AuthToken(token, key);
-    }
-
-    public Authentication getAuthentication(AuthToken authToken){
-        if(authToken.validate()) {
+    public Authentication getAuthentication(AuthToken authToken) {
+        if (authToken.validate()) {
 
             Claims claims = authToken.getTokenClaims();
             Collection<? extends GrantedAuthority> authorities =

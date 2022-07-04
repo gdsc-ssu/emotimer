@@ -6,25 +6,54 @@ part of 'timer-store.dart';
 // StoreGenerator
 // **************************************************************************
 
-// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
+// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$TimerStore on _TimerStore, Store {
-  final _$pauseAtom = Atom(name: '_TimerStore.pause');
+  Computed<String>? _$remainedTimeComputed;
 
   @override
-  bool get pause {
-    _$pauseAtom.reportRead();
-    return super.pause;
+  String get remainedTime =>
+      (_$remainedTimeComputed ??= Computed<String>(() => super.remainedTime,
+              name: '_TimerStore.remainedTime'))
+          .value;
+  Computed<String>? _$durationTimeComputed;
+
+  @override
+  String get durationTime =>
+      (_$durationTimeComputed ??= Computed<String>(() => super.durationTime,
+              name: '_TimerStore.durationTime'))
+          .value;
+  Computed<TimerStatus>? _$statusComputed;
+
+  @override
+  TimerStatus get status => (_$statusComputed ??=
+          Computed<TimerStatus>(() => super.status, name: '_TimerStore.status'))
+      .value;
+  Computed<double>? _$percentComputed;
+
+  @override
+  double get percent => (_$percentComputed ??=
+          Computed<double>(() => super.percent, name: '_TimerStore.percent'))
+      .value;
+
+  late final _$isPausedAtom =
+      Atom(name: '_TimerStore.isPaused', context: context);
+
+  @override
+  bool get isPaused {
+    _$isPausedAtom.reportRead();
+    return super.isPaused;
   }
 
   @override
-  set pause(bool value) {
-    _$pauseAtom.reportWrite(value, super.pause, () {
-      super.pause = value;
+  set isPaused(bool value) {
+    _$isPausedAtom.reportWrite(value, super.isPaused, () {
+      super.isPaused = value;
     });
   }
 
-  final _$startTimeAtom = Atom(name: '_TimerStore.startTime');
+  late final _$startTimeAtom =
+      Atom(name: '_TimerStore.startTime', context: context);
 
   @override
   DateTime? get startTime {
@@ -39,7 +68,24 @@ mixin _$TimerStore on _TimerStore, Store {
     });
   }
 
-  final _$remainedSecondsAtom = Atom(name: '_TimerStore.remainedSeconds');
+  late final _$durationAtom =
+      Atom(name: '_TimerStore.duration', context: context);
+
+  @override
+  Duration get duration {
+    _$durationAtom.reportRead();
+    return super.duration;
+  }
+
+  @override
+  set duration(Duration value) {
+    _$durationAtom.reportWrite(value, super.duration, () {
+      super.duration = value;
+    });
+  }
+
+  late final _$remainedSecondsAtom =
+      Atom(name: '_TimerStore.remainedSeconds', context: context);
 
   @override
   int get remainedSeconds {
@@ -54,25 +100,37 @@ mixin _$TimerStore on _TimerStore, Store {
     });
   }
 
-  final _$_TimerStoreActionController = ActionController(name: '_TimerStore');
+  late final _$_TimerStoreActionController =
+      ActionController(name: '_TimerStore', context: context);
 
   @override
-  void start(int sessionSeconds) {
+  void start({int? sessionSeconds, VoidCallback? onFinish}) {
     final _$actionInfo =
         _$_TimerStoreActionController.startAction(name: '_TimerStore.start');
     try {
-      return super.start(sessionSeconds);
+      return super.start(sessionSeconds: sessionSeconds, onFinish: onFinish);
     } finally {
       _$_TimerStoreActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void stop() {
+  void pause() {
     final _$actionInfo =
-        _$_TimerStoreActionController.startAction(name: '_TimerStore.stop');
+        _$_TimerStoreActionController.startAction(name: '_TimerStore.pause');
     try {
-      return super.stop();
+      return super.pause();
+    } finally {
+      _$_TimerStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void restart() {
+    final _$actionInfo =
+        _$_TimerStoreActionController.startAction(name: '_TimerStore.restart');
+    try {
+      return super.restart();
     } finally {
       _$_TimerStoreActionController.endAction(_$actionInfo);
     }
@@ -92,9 +150,14 @@ mixin _$TimerStore on _TimerStore, Store {
   @override
   String toString() {
     return '''
-pause: ${pause},
+isPaused: ${isPaused},
 startTime: ${startTime},
-remainedSeconds: ${remainedSeconds}
+duration: ${duration},
+remainedSeconds: ${remainedSeconds},
+remainedTime: ${remainedTime},
+durationTime: ${durationTime},
+status: ${status},
+percent: ${percent}
     ''';
   }
 }

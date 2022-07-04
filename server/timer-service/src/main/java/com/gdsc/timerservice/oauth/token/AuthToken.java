@@ -1,44 +1,54 @@
 package com.gdsc.timerservice.oauth.token;
 
+import com.gdsc.timerservice.config.properties.AppProperties;
+import com.gdsc.timerservice.oauth.entity.RoleType;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import java.security.Key;
+
 import java.util.Date;
 
 @Slf4j
-@RequiredArgsConstructor
+@Getter
 public class AuthToken {
-    @Getter
-    private final String token;
-    private final Key key;
+    private String token;
 
-    private static final String AUTHORITIES_KEY = "role";
+    private final AppProperties appProperties;
 
-    AuthToken(String id, Date expiry, Key key) {
-        this.key = key;
-        this.token = createAuthToken(id, expiry);
+    //AuthToken(Long id, String email, Date expiry) {
+    //    this.token = createAuthToken(id, email, RoleType.USER, expiry);
+    //    this.appProperties = appProperties;
+    //}
+
+//    AuthToken(String token) {
+//        this.token = token;
+//    }
+
+    public AuthToken(AppProperties appProperties) {
+        this.appProperties = appProperties;
     }
 
-    AuthToken(String email, String role, Date expiry, Key key) {
-        this.key = key;
-        this.token = createAuthToken(email, role, expiry);
+    public static AuthToken createNewOne(AppProperties appProperties, String token) {
+        AuthToken authToken = new AuthToken(appProperties);
+        authToken.token = token;
+        return authToken;
     }
 
-    private String createAuthToken(String email, Date expiry) {
+    public AuthToken(AppProperties appProperties, Long id, String email, Date expiry) {
+        this.appProperties = appProperties;
+        this.token = createAuthToken(id, email, RoleType.USER, expiry);
+    }
+
+
+    private String createAuthToken(Long id, String email, RoleType role, Date expiry) {
+        Claims claims = Jwts.claims().setSubject(email);
+        claims.put("id", id);
+        claims.put("role", role);
         return Jwts.builder()
-                .setSubject(email)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .setExpiration(expiry)
-                .compact();
-    }
-
-    private String createAuthToken(String email, String role, Date expiry) {
-        return Jwts.builder()
-                .setSubject(email)
-                .claim(AUTHORITIES_KEY, role)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .setClaims(claims)
+                .signWith(Keys.hmacShaKeyFor(appProperties.getAuth().getTokenSecret().getBytes()), SignatureAlgorithm.HS256)
                 .setExpiration(expiry)
                 .compact();
     }
@@ -50,7 +60,7 @@ public class AuthToken {
     public Claims getTokenClaims() {
         try {
             return Jwts.parserBuilder()
-                    .setSigningKey(key)
+                    .setSigningKey(Keys.hmacShaKeyFor(appProperties.getAuth().getTokenSecret().getBytes()))
                     .build()
                     .parseClaimsJws(token)
                     .getBody();

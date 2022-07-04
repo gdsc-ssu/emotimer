@@ -1,13 +1,19 @@
 package com.gdsc.timerservice.oauth.model;
 
+import com.gdsc.timerservice.config.properties.OAuthProperties;
 import com.gdsc.timerservice.oauth.entity.ProviderType;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+
+@RequiredArgsConstructor
 public enum OAuthVendor {
+
+
     KAKAO {
         @Override
         public String getTokenUrl() {
@@ -38,9 +44,8 @@ public enum OAuthVendor {
             // HttpBody 생성.
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
             params.add("grant_type", "authorization_code");
-            params.add("client_id", "116cc9d3778c5d9578487bce8f08e024");
-            // TODO 클라이언트 id 와 secret .proterties 파일에서 불러오기
-            params.add("client_secret", "aTnSYwnw2qCJ0zZ9Br74HUUoWS0kMVwy");
+            params.add("client_id", oAuthProperties.getKakaoClientId());
+            params.add("client_secret", oAuthProperties.getKakaoClientSecret());
             params.add("redirect_uri", "http://localhost:8080/callback/kakao");
             params.add("code", code);
 
@@ -92,4 +97,8 @@ public enum OAuthVendor {
     public static OAuthVendor getVendor(String name) {
         return valueOf(name.toUpperCase());
     }
+
+    public static OAuthProperties oAuthProperties;
+
+
 }

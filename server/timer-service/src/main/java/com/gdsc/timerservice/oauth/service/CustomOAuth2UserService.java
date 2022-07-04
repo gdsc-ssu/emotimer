@@ -39,7 +39,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2User user = super.loadUser(userRequest);
 
         try{
-            return this.process(userRequest, user); // 이 함수에서 DB 뒤짐.
+            return this.updateOrCreate(userRequest, user); // 이 함수에서 DB 뒤짐.
         }catch (AuthenticationException e){
             throw e;
         } catch (Exception e){
@@ -48,15 +48,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
     }
 
-    /**
-     *
-     * @param userRequest
-     * @param user
-     * @return DB 를 뒤져서, 전에 가입했던 회원인지 아닌지 체크.
-     * 만약 가입된 회원이면 updateUser 로 소셜의 사용자 정보 업데이트하여 저장.
-     * DB 에 없는 회원이라면 createUser 하여 DB 에 저장.
-     */
-    private OAuth2User process(OAuth2UserRequest userRequest,OAuth2User user){
+    private OAuth2User updateOrCreate(OAuth2UserRequest userRequest, OAuth2User user){
         ProviderType providerType = ProviderType.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase()); // 벤더 이름 뽑아냄.
         OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType,user.getAttributes());
 
@@ -99,7 +91,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user.setUsername(userInfo.getUserName());
         }
         // 유저의 이미지 url 이 우리 DB 에 저장된것과 달려졌다면 업뎃.
-        if(userInfo.getUserName() != null && ! ( userInfo.getUserName().equals(userInfo.getImageUrl()) )){
+        if(userInfo.getImageUrl() != null && ! ( userInfo.getImageUrl().equals(userInfo.getImageUrl()) )){
             user.setImageUrl(userInfo.getImageUrl());
         }
         return user;

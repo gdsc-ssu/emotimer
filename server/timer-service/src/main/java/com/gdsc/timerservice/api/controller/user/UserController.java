@@ -20,20 +20,4 @@ public class UserController {
         return "index";
     }
 
-//    @PostMapping("/test") // POST 요청은 csrf 설정을 따로 해주지 않는다면 다른 서버에서 POST 등 리소스의 상태를 변경하는 동작 아예 수행 불가.
-//    public String test(){
-//        return "i am data from POST request";
-//    }
-//    @GetMapping("/test") // GET 요청은 csrf 에서 자유로움.
-//    public String tt(){
-//        return "i am data from GET request";
-//    }
-
-//    @GetMapping("/email")
-//    public @ResponseBody String getUserEmail(@AuthenticationPrincipal UserPrincipal user){ // 세션 정책을 STATELESS 하게 설정했기 때문에 세션에 유저정보 저장 안함. 그래서 당연히 못가져오는듯. null 값!
-////        log.info("현재 로그인된 유저의 이메일 정보 가져오기: {}", principal.getUser().getEmail());
-//        log.info(String.valueOf(user));
-//        return "유저 정보";
-//    }
-
 }

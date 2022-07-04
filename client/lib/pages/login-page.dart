@@ -10,33 +10,19 @@ class LoginPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const TextField(
-              decoration: InputDecoration(
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                  labelText: 'email',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  )),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            const TextField(
-              decoration: InputDecoration(
-                  labelText: 'password',
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                  )),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            ElevatedButton(
+            ElevatedButton.icon(
               onPressed: () {},
-              child: const Text("Login"),
+              icon: Image.asset(
+                "assets/icon/kakao.png",
+                height: 16,
+                alignment: Alignment.centerLeft,
+              ),
+              label: const Text("Login with kakao",
+                  style: TextStyle(color: Color.fromRGBO(0, 0, 0, 1))),
               style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(50)),
+                minimumSize: const Size.fromHeight(50),
+                primary: const Color.fromRGBO(247, 230, 0, 1.0),
+              ),
             )
           ],
         ),
