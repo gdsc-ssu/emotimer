@@ -9,7 +9,6 @@ import com.gdsc.timerservice.oauth.handler.OAuth2AuthenticationSuccessHandler;
 import com.gdsc.timerservice.oauth.service.CustomOAuth2UserService;
 import com.gdsc.timerservice.oauth.service.IssueRefreshService;
 import com.gdsc.timerservice.oauth.token.AuthTokenProvider;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,18 +18,17 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.security.Key;
-
 @RequiredArgsConstructor
 @EnableWebSecurity(debug = true) // Spring Security 설정을 활성화
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final IssueRefreshService issueRefreshService;
 
-    private final CustomOAuth2UserService oAuth2UserService;
+    private final CustomOAuth2UserService customOAuth2UserService;
     private final AppProperties appProperties;
     private final AuthTokenProvider tokenProvider; // config > security > JwtConfig 에서 빈으로 등록했음. 주입받을 수 있음.
     private final UserRefreshTokenRepository userRefreshTokenRepository;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable(); // 일단은 csrf 필터 생성을 막음. 즉 스프링 시큐리티에서 기본적으로 제공하는 csrf 필터를 거치지 않음. 어느 인스턴스에서든 이 서버로 접근 가능하지만, csrf 공격에 취약. 그냥 jwt 토큰으로만 접근관리 하겠음.
@@ -46,8 +44,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // oauth 로그인 설정
         http.oauth2Login()
                 .userInfoEndpoint()
-                .userService(oAuth2UserService) // oauth2 로그인 성공시 수행될 서비스 등록. 새로운 사용자라면 db 에 User insert 진행. 아니라면 update 로직 수행.
-            .and()
+                .userService(customOAuth2UserService) // oauth2 로그인 성공시 수행될 서비스 등록. 새로운 사용자라면 db 에 User insert 진행. 아니라면 update 로직 수행.
+                .and()
                 .successHandler(oAuth2AuthenticationSuccessHandler()) // 소셜 로그인 성공시, 실행되는 핸들러. jwt 토큰(access token , refresh token) 생성하여 응답
                 .failureHandler(oAuth2AuthenticationFailureHandler());
 
@@ -70,8 +68,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * 토큰 필터 설정
      */
     @Bean
-    public TokenAuthenticationFilter tokenAuthenticationFilter(){
-        return new TokenAuthenticationFilter(tokenProvider,issueRefreshService);
+    public TokenAuthenticationFilter tokenAuthenticationFilter() {
+        return new TokenAuthenticationFilter(tokenProvider, issueRefreshService);
     }
 
     /**
@@ -79,7 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * - access token 과 refresh token 을 발급하여 응답헤더에 반환
      */
     @Bean
-    public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler(){
+    public OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler() {
         return new OAuth2AuthenticationSuccessHandler(
                 tokenProvider,
                 appProperties,
@@ -91,7 +89,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * OAuth 인증 실패 핸들러.
      */
     @Bean
-    public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler(){
+    public OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler() {
         return new OAuth2AuthenticationFailureHandler();
     }
 

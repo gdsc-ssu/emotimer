@@ -21,6 +21,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -54,21 +55,21 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         ProviderType providerType = ProviderType.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase()); // 벤더 이름 뽑아냄.
         OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType,user.getAttributes());
 
-        User savedUser = userRepository.findByEmail(userInfo.getEmail()); // 우리 애플리케이션 DB 에 회원 이메일이 있는지 없는지 확인.
+        User savedUser = findUser(providerType, userInfo);
+        return new UserPrincipal(savedUser, user.getAttributes());
+    }
 
-        if(savedUser != null){ // 기존에 가입되었었던 회원이라면
-
+    private User findUser(ProviderType providerType, OAuth2UserInfo userInfo) {
+        Optional<User> optionalUser = userRepository.findByEmail(userInfo.getEmail());
+        optionalUser.ifPresent(savedUser -> {
             if (providerType != savedUser.getProviderType()){ // 가입된 회원이긴 한데 이전에 로그인한 소셜과 다른 소셜로 로그인 한 경우.
                 throw new OAuthProviderMissMatchException(
-                      "이전에 " + providerType + " 계정으로 로그인하셨던 적이 있습니다. "  + providerType + " 으로 로그인해주세요."
+                        "이전에 " + providerType + " 계정으로 로그인하셨던 적이 있습니다. "  + providerType + " 으로 로그인해주세요."
                 );
             }
-            savedUser = updateUser(savedUser, userInfo); // 그냥 유저 정보 업데이트 된거 있으면 업데이트만!
-        }else{
-            savedUser = createUser(userInfo, providerType); // 처음 로그인하는 회원이라면 유저 생성하여 DB 에 저장.
-        }
-
-        return new UserPrincipal(savedUser, user.getAttributes());
+            updateUser(savedUser, userInfo); // 그냥 유저 정보 업데이트 된거 있으면 업데이트만!
+        });
+        return optionalUser.orElse(createUser(userInfo, providerType));
     }
 
     // 새로운 유저 생성하여 DB 에 저장

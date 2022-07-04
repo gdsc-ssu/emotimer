@@ -10,7 +10,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 
-@RequiredArgsConstructor
+
 public enum OAuthVendor {
 
 
@@ -67,6 +67,8 @@ public enum OAuthVendor {
             return ProviderType.KAKAO;
         }
     };
+
+
 
     /**
      * TODO 주석 달기

@@ -30,7 +30,7 @@ public class IssueRefreshService {
     private final AuthTokenProvider tokenProvider;
     private final UserRefreshTokenRepository userRefreshTokenRepository;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     public void refreshToken(HttpServletRequest request, HttpServletResponse response){
         log.info("리프레시 토큰 발급 준비중...");
