@@ -55,7 +55,7 @@ public class User {
     private String imageUrl;
 
     @Builder
-    public User(String email, String password, String username, ProviderType providerType, RoleType roleType){
+    public User(String email, String password, String username, ProviderType providerType, RoleType roleType) {
         this.email = email;
         this.password = password;
         this.username = username;
@@ -65,5 +65,11 @@ public class User {
 
     public User(Long userId) {
         this.userId = userId;
+    }
+
+    public User(User user) {
+        this.username = user.getUsername();
+        this.roleType = user.getRoleType();
+        this.email = user.getEmail();
     }
 }
