@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<meta charset="UTF-8">
+<title>Title</title>
+<body>
+    <h1>This is main page!</h1>
+    <!-- 구글 로그인으로의 경로 스프링시큐리티가 이미 정의한 주소. 스프링 시큐리티가 내가 굳이 정의하지 않아도 이 주소는 낚아챔 -->
+    <a href="/oauth2/authorization/google">Google 로그인</a>
+    <!-- 카카오 로그인으로의 경로는 내가 직접 컨트롤러에서 정의한 주소를 탄다  -->
+    <a href="/oauth2/authorization/kakao">Kakao 로그인</a>
+</body>
+</html>
