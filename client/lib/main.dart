@@ -1,11 +1,30 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:gdsc_timer/routes.dart';
 import 'package:gdsc_timer/store/auth-store.dart';
 import 'package:gdsc_timer/store/timer-store.dart';
 import 'package:provider/provider.dart';
+import 'package:window_manager/window_manager.dart';
 
-void main() {
+void main() async {
+
+  if (Platform.isMacOS || Platform.isWindows) {
+    WidgetsFlutterBinding.ensureInitialized();
+    await windowManager.ensureInitialized();
+    windowManager.setResizable(false);
+    windowManager.waitUntilReadyToShow(const WindowOptions(
+      size: Size(400, 700),
+      center: true,
+      backgroundColor: Colors.transparent,
+      skipTaskbar: false,
+      titleBarStyle: TitleBarStyle.hidden,
+    ), () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
+
   runApp(const MyApp());
 }
 

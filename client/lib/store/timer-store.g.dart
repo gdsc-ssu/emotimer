@@ -9,12 +9,19 @@ part of 'timer-store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$TimerStore on _TimerStore, Store {
-  Computed<String>? _$renamedTimeComputed;
+  Computed<String>? _$remainedTimeComputed;
 
   @override
   String get remainedTime =>
-      (_$renamedTimeComputed ??= Computed<String>(() => super.remainedTime,
-              name: '_TimerStore.renamedTime'))
+      (_$remainedTimeComputed ??= Computed<String>(() => super.remainedTime,
+              name: '_TimerStore.remainedTime'))
+          .value;
+  Computed<String>? _$durationTimeComputed;
+
+  @override
+  String get durationTime =>
+      (_$durationTimeComputed ??= Computed<String>(() => super.durationTime,
+              name: '_TimerStore.durationTime'))
           .value;
   Computed<TimerStatus>? _$statusComputed;
 
@@ -97,11 +104,11 @@ mixin _$TimerStore on _TimerStore, Store {
       ActionController(name: '_TimerStore', context: context);
 
   @override
-  void start(int sessionSeconds) {
+  void start({int? sessionSeconds, VoidCallback? onFinish}) {
     final _$actionInfo =
         _$_TimerStoreActionController.startAction(name: '_TimerStore.start');
     try {
-      return super.start(sessionSeconds);
+      return super.start(sessionSeconds: sessionSeconds, onFinish: onFinish);
     } finally {
       _$_TimerStoreActionController.endAction(_$actionInfo);
     }
@@ -147,7 +154,8 @@ isPaused: ${isPaused},
 startTime: ${startTime},
 duration: ${duration},
 remainedSeconds: ${remainedSeconds},
-renamedTime: ${remainedTime},
+remainedTime: ${remainedTime},
+durationTime: ${durationTime},
 status: ${status},
 percent: ${percent}
     ''';
