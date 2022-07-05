@@ -88,15 +88,15 @@ mixin _$TimerStore on _TimerStore, Store {
       Atom(name: '_TimerStore.remainedSeconds', context: context);
 
   @override
-  int get remainedSeconds {
+  int get sessionSeconds {
     _$remainedSecondsAtom.reportRead();
-    return super.remainedSeconds;
+    return super.sessionSeconds;
   }
 
   @override
-  set remainedSeconds(int value) {
-    _$remainedSecondsAtom.reportWrite(value, super.remainedSeconds, () {
-      super.remainedSeconds = value;
+  set sessionSeconds(int value) {
+    _$remainedSecondsAtom.reportWrite(value, super.sessionSeconds, () {
+      super.sessionSeconds = value;
     });
   }
 
@@ -104,11 +104,11 @@ mixin _$TimerStore on _TimerStore, Store {
       ActionController(name: '_TimerStore', context: context);
 
   @override
-  void start({int? sessionSeconds, VoidCallback? onFinish}) {
+  void start({int? durationSeconds, VoidCallback? onFinish}) {
     final _$actionInfo =
         _$_TimerStoreActionController.startAction(name: '_TimerStore.start');
     try {
-      return super.start(sessionSeconds: sessionSeconds, onFinish: onFinish);
+      return super.start(durationSeconds: durationSeconds, onFinish: onFinish);
     } finally {
       _$_TimerStoreActionController.endAction(_$actionInfo);
     }
@@ -126,11 +126,11 @@ mixin _$TimerStore on _TimerStore, Store {
   }
 
   @override
-  void restart() {
+  void resume() {
     final _$actionInfo =
         _$_TimerStoreActionController.startAction(name: '_TimerStore.restart');
     try {
-      return super.restart();
+      return super.resume();
     } finally {
       _$_TimerStoreActionController.endAction(_$actionInfo);
     }
@@ -153,7 +153,7 @@ mixin _$TimerStore on _TimerStore, Store {
 isPaused: ${isPaused},
 startTime: ${startTime},
 duration: ${duration},
-remainedSeconds: ${remainedSeconds},
+remainedSeconds: ${sessionSeconds},
 remainedTime: ${remainedTime},
 durationTime: ${durationTime},
 status: ${status},

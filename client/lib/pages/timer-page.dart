@@ -30,25 +30,24 @@ final ConfettiController _confettiController = ConfettiController(
 );
 
 class TimerPage extends StatelessWidget {
+  final maximumSeconds = 3600;
+
   @override
   Widget build(BuildContext context) {
     final timerStore = Provider.of<TimerStore>(context);
     return Observer(builder: (_) {
-      var maximumSeconds = 3600;
-
       OnChange? onChange = (double value) {
+        print("onChange: $value");
         var seconds = (value * maximumSeconds).toInt();
         timerStore.duration = Duration(seconds: max(seconds - seconds % 5, 5));
       };
       var displayTime = timerStore.durationTime;
       var currentValue = timerStore.duration.inSeconds.toDouble() / maximumSeconds;
-
       if (timerStore.status != TimerStatus.ready) {
         onChange = null;
         displayTime = timerStore.remainedTime;
         currentValue = timerStore.percent;
       }
-
       return Scaffold(
           body: Center(
               child: Column(
@@ -90,7 +89,7 @@ class TimerPage extends StatelessWidget {
                 });
               },
               onReset: () => timerStore.reset(),
-              onResume: () => timerStore.restart(),
+              onResume: () => timerStore.resume(),
               onPause: () => timerStore.pause(),
             ),
           )
