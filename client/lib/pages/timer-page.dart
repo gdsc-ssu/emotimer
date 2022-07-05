@@ -5,8 +5,8 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:gdsc_timer/shared/app_colors.dart';
+import 'package:gdsc_timer/shared/slider/sleek_circular_slider.dart';
 import 'package:provider/provider.dart';
-import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
 import '../store/timer-store.dart';
 
