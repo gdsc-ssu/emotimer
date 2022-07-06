@@ -8,20 +8,19 @@ import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter/foundation.dart';
 
-
 void main() async {
-
   if (!kIsWeb && (Platform.isMacOS || Platform.isWindows)) {
     WidgetsFlutterBinding.ensureInitialized();
     await windowManager.ensureInitialized();
     windowManager.setResizable(false);
-    windowManager.waitUntilReadyToShow(const WindowOptions(
-      size: Size(400, 700),
-      center: true,
-      backgroundColor: Colors.transparent,
-      skipTaskbar: false,
-      titleBarStyle: TitleBarStyle.hidden,
-    ), () async {
+    windowManager.waitUntilReadyToShow(
+        const WindowOptions(
+          size: Size(400, 700),
+          backgroundColor: Colors.transparent,
+          skipTaskbar: false,
+          title: 'emotimer',
+          titleBarStyle: TitleBarStyle.hidden,
+        ), () async {
       await windowManager.show();
       await windowManager.focus();
     });
