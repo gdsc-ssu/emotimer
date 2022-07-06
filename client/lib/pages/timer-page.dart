@@ -17,10 +17,7 @@ final appearance = CircularSliderAppearance(
   size: 300,
   customWidths: CustomSliderWidths(progressBarWidth: 12, trackWidth: 12, handlerSize: 12, shadowWidth: 2),
   customColors: CustomSliderColors(
-    progressBarColors: [
-      Color(0xff242934),
-      AppColors.primary,
-    ],
+    progressBarColors: [AppColors.primary, Color(0xff1b2944)],
     dotColor: AppColors.primary,
     trackColor: Colors.black12,
   ),

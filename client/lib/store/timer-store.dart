@@ -19,11 +19,13 @@ abstract class _TimerStore with Store {
     _atom = Atom(
         name: "Seconds ticker",
         onObserved: () {
-          _timer = Timer.periodic(Duration(milliseconds: 100), (Timer timer) {
+          _timer = Timer.periodic(const Duration(milliseconds: 100), (Timer timer) {
             if (remainedSeconds == 0) {
-              reset();
-              _onFinish?.call();
-              return;
+              Timer(const Duration(milliseconds: 300), () {
+                _onFinish?.call();
+                reset();
+              });
+              _timer?.cancel();
             }
             _atom.reportChanged();
           });
