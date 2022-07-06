@@ -39,15 +39,6 @@ public class TimerServiceApplication {
     }
 
 
-    @Component
-    @RequiredArgsConstructor
-    static class MyApplicationRunner implements ApplicationRunner {
-        private final OAuthProperties oAuthProperties;
 
-        @Override
-        public void run(ApplicationArguments args) throws Exception {
-            OAuthVendor.oAuthProperties = oAuthProperties;
-        }
-    }
 
 }
