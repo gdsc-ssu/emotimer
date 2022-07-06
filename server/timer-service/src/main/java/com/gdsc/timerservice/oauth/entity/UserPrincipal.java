@@ -30,11 +30,6 @@ public class UserPrincipal extends org.springframework.security.core.userdetails
                 .collect(Collectors.toSet());
     }
 
-//    public UserPrincipal(User user, Map<String, Object> oauthUserAttributes) {
-//        this.user = user;
-//        this.oauthUserAttributes = oauthUserAttributes;
-//    }
-
 
     @Override
     public boolean isAccountNonExpired() {

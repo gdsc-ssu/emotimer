@@ -31,7 +31,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable(); // 일단은 csrf 필터 생성을 막음. 즉 스프링 시큐리티에서 기본적으로 제공하는 csrf 필터를 거치지 않음. 어느 인스턴스에서든 이 서버로 접근 가능하지만, csrf 공격에 취약. 그냥 jwt 토큰으로만 접근관리 하겠음.
+        http.csrf().disable();
 
         // 메인화면 ("/" 루트 경로) 는 누구나 접근 가능. 이 경로에서 소셜 로그인 진행.
         http.authorizeRequests()
