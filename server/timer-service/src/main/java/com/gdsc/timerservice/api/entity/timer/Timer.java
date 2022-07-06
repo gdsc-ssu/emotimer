@@ -37,10 +37,9 @@ public class Timer {
 	@Column
 	private Long remainedSeconds;
 
-	//TODO 유저 Setting 이후 Category로 변경
 	@Column
 	@Enumerated(EnumType.STRING)
-	private Emoji category;
+	private Emoji emoji;
 
 	@Column
 	@Enumerated(EnumType.STRING)

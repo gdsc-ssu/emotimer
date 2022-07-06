@@ -25,7 +25,7 @@ public class WebSocketTimerOperator {
 	public void changeTimerSetting(WebSocketChangeTimerSettingsRequest timerSettings) {
 		WebSocketChangeTimerSettingsResponse response = WebSocketChangeTimerSettingsResponse.builder()
 			.totalTimeSeconds(timerSettings.getTotalTimeSeconds())
-			.category(timerSettings.getCategory()).build();
+			.emoji(timerSettings.getEmoji()).build();
 
 		messagingTemplate.convertAndSend("sub/timer/" + timerSettings.getUserId(), response);
 	}

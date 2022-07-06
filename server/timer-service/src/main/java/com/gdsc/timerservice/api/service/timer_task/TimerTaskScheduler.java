@@ -36,7 +36,7 @@ public class TimerTaskScheduler {
 					.userId(createTimerTaskRequest.getUserId())
 					.spentTime(createTimerTaskRequest.getTotalTimeSeconds())
 					.succeed(true)
-					.category(createTimerTaskRequest.getCategory()).build();
+					.emoji(createTimerTaskRequest.getEmoji()).build();
 
 				timerHistoryService.createTimerHistory(createTimerHistoryRequest);
 

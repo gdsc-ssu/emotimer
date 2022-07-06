@@ -46,13 +46,13 @@ public class TimerService {
 		if (timer != null) {
 			timer.setTotalTimeSeconds(setTimerSettingsRequest.getTotalTime());
 			timer.setRemainedSeconds(setTimerSettingsRequest.getTotalTime());
-			timer.setCategory(setTimerSettingsRequest.getCategory());
+			timer.setEmoji(setTimerSettingsRequest.getEmoji());
 			timer.setTimerStatus(READY);
 
 			WebSocketChangeTimerSettingsRequest changeTimerSettingsRequest = WebSocketChangeTimerSettingsRequest.builder()
 				.userId(setTimerSettingsRequest.getUserId())
 				.totalTimeSeconds(setTimerSettingsRequest.getTotalTime())
-				.category(setTimerSettingsRequest.getCategory()).build();
+				.emoji(setTimerSettingsRequest.getEmoji()).build();
 
 			webSocketTimerOperator.changeTimerSetting(changeTimerSettingsRequest);
 
@@ -60,7 +60,7 @@ public class TimerService {
 				.startedAt(timer.getStartedAt())
 				.totalTimeSeconds(timer.getTotalTimeSeconds())
 				.remainedSeconds(timer.getRemainedSeconds())
-				.category(timer.getCategory()).build();
+				.emoji(timer.getEmoji()).build();
 		}
 
 		timer = Timer.builder()
@@ -68,7 +68,7 @@ public class TimerService {
 			.userId(setTimerSettingsRequest.getUserId())
 			.totalTimeSeconds(setTimerSettingsRequest.getTotalTime())
 			.remainedSeconds(setTimerSettingsRequest.getTotalTime())
-			.category(setTimerSettingsRequest.getCategory())
+			.emoji(setTimerSettingsRequest.getEmoji())
 			.timerStatus(READY)
 			.build();
 		timerRepository.save(timer);
@@ -77,7 +77,7 @@ public class TimerService {
 			.startedAt(timer.getStartedAt())
 			.totalTimeSeconds(timer.getTotalTimeSeconds())
 			.remainedSeconds(timer.getRemainedSeconds())
-			.category(timer.getCategory()).build();
+			.emoji(timer.getEmoji()).build();
 	}
 
 	public GetTimerResponse getTimer(String userId) {
@@ -86,7 +86,7 @@ public class TimerService {
 			.startedAt(timer.getStartedAt())
 			.totalTimeSeconds(timer.getTotalTimeSeconds())
 			.remainedSeconds(timer.getRemainedSeconds())
-			.category(timer.getCategory())
+			.emoji(timer.getEmoji())
 			.timerStatus(timer.getTimerStatus()).build();
 	}
 
@@ -106,7 +106,7 @@ public class TimerService {
 			.userId(startTimerRequest.getUserId())
 			.totalTimeSeconds(timer.getTotalTimeSeconds())
 			.remainedSeconds(timer.getRemainedSeconds())
-			.category(timer.getCategory()).build();
+			.emoji(timer.getEmoji()).build();
 
 		timerTaskScheduler.createSuccessTimerTask(createTimerTaskRequest);
 	}
@@ -146,7 +146,7 @@ public class TimerService {
 			.userId(resumeTimerRequest.getUserId())
 			.totalTimeSeconds(timer.getTotalTimeSeconds())
 			.remainedSeconds(timer.getRemainedSeconds())
-			.category(timer.getCategory()).build();
+			.emoji(timer.getEmoji()).build();
 
 		timerTaskScheduler.createSuccessTimerTask(createTimerTaskRequest);
 	}
@@ -169,7 +169,7 @@ public class TimerService {
 			.userId(resetTimerRequest.getUserId())
 			.spentTime(timer.getTotalTimeSeconds() - resetTimerRequest.getRemainedSeconds())
 			.succeed(false)
-			.category(timer.getCategory()).build();
+			.emoji(timer.getEmoji()).build();
 
 		timerHistoryService.createTimerHistory(createTimerHistoryRequest);
 	}

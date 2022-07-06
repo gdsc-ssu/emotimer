@@ -21,7 +21,7 @@ public class GetTimerResponse {
 
 	private Long remainedSeconds;
 
-	private Emoji category;
+	private Emoji emoji;
 
 	private TimerStatus timerStatus;
 }

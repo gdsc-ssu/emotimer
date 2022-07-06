@@ -14,5 +14,5 @@ public class CreateTimerHistoryRequest {
 
 	private boolean succeed;
 
-	private Emoji category;
+	private Emoji emoji;
 }

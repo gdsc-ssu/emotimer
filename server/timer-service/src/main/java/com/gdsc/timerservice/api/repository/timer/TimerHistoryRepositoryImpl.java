@@ -2,12 +2,16 @@ package com.gdsc.timerservice.api.repository.timer;
 
 import static com.gdsc.timerservice.api.entity.timer.QTimerHistory.timerHistory;
 
-import com.gdsc.timerservice.api.dtos.timer.response.GetTimerStatisticsResponse;
-import com.gdsc.timerservice.api.dtos.timer.response.QTimerStatistics;
-import com.gdsc.timerservice.api.dtos.timer.response.TimerStatistics;
+import com.gdsc.timerservice.api.dtos.timerhistory.TimerStatistics;
+import com.gdsc.timerservice.api.dtos.timerhistory.TimerStatisticsOfYear;
+import com.gdsc.timerservice.api.dtos.timerhistory.queryprojection.QQueryForTimerStatisticsOfYear;
+import com.gdsc.timerservice.api.dtos.timerhistory.queryprojection.QueryForTimerStatisticsOfYear;
+import com.gdsc.timerservice.api.dtos.timerhistory.response.GetTimerStatisticsOfYearResponse;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -20,20 +24,33 @@ public class TimerHistoryRepositoryImpl implements TimerHistoryRepositoryCustom 
 	}
 
 	@Override
-	public GetTimerStatisticsResponse getTimerStatistics(String userId, int year, Integer month, Integer day) {
+	public GetTimerStatisticsOfYearResponse getTimerStatisticsOfYear(String userId, int year) {
 
-		GetTimerStatisticsResponse response = new GetTimerStatisticsResponse();
+		List<TimerStatisticsOfYear> timerStatisticsOfYear = new ArrayList<>();
 
-		List<TimerStatistics> timerStatisticsList = queryFactory
-			.select(new QTimerStatistics(timerHistory.category, timerHistory.spentSeconds.sum()))
+		List<QueryForTimerStatisticsOfYear> queryResult = queryFactory
+			.select(new QQueryForTimerStatisticsOfYear(timerHistory.month, timerHistory.emoji, timerHistory.spentSeconds.sum()))
 			.from(timerHistory)
-			.where(allEqual(year, month, day).and(timerHistory.userId.eq(userId)))
-			.groupBy(timerHistory.category)
-			.orderBy(timerHistory.spentSeconds.sum().desc())
+			.where(timerHistory.year.eq(year).and(timerHistory.userId.eq(userId)))
+			.groupBy(timerHistory.emoji, timerHistory.month)
+			.orderBy(timerHistory.month.desc(), timerHistory.spentSeconds.sum().desc())
 			.fetch();
 
-		response.setTimerStatisticsList(timerStatisticsList);
+		queryResult.stream().collect(Collectors.groupingBy(QueryForTimerStatisticsOfYear::getMonth))
+			.forEach((month, queryResults) -> timerStatisticsOfYear.add(new TimerStatisticsOfYear(month, makeTimerStatisticsList(queryResults))));
+
+		GetTimerStatisticsOfYearResponse response = new GetTimerStatisticsOfYearResponse(timerStatisticsOfYear);
 		return response;
+	}
+
+	private List<TimerStatistics> makeTimerStatisticsList(List<QueryForTimerStatisticsOfYear> list) {
+		List<TimerStatistics> statisticsList = new ArrayList<>();
+		list.stream().forEach(
+			each -> {
+				statisticsList.add(new TimerStatistics(each.getEmoji(), each.getTotalSeconds()));
+			}
+		);
+		return statisticsList;
 	}
 
 	private BooleanBuilder allEqual(int year, Integer month, Integer day) {

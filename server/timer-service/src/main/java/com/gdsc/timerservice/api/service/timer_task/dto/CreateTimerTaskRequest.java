@@ -14,5 +14,5 @@ public class CreateTimerTaskRequest {
 
 	private long remainedSeconds;
 
-	private Emoji category;
+	private Emoji emoji;
 }

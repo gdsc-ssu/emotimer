@@ -12,5 +12,5 @@ public class WebSocketChangeTimerSettingsResponse {
 
 	private long totalTimeSeconds;
 
-	private Emoji category;
+	private Emoji emoji;
 }

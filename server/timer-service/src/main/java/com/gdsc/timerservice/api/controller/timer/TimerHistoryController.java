@@ -1,6 +1,6 @@
 package com.gdsc.timerservice.api.controller.timer;
 
-import com.gdsc.timerservice.api.dtos.timer.response.GetTimerStatisticsResponse;
+import com.gdsc.timerservice.api.dtos.timerhistory.response.GetTimerStatisticsOfYearResponse;
 import com.gdsc.timerservice.api.service.timer.TimerHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,12 +16,10 @@ public class TimerHistoryController {
 	private final TimerHistoryService timerHistoryService;
 
 	@GetMapping("")
-	public GetTimerStatisticsResponse getTimerStatistics(
-		@RequestParam(value = "userId") String userId, // userId는 이후 requestparam말고 security를 통해서 주입받는 것으로 변경
-		@RequestParam(value = "year") int year,
-		@RequestParam(value = "month", required = false) Integer month,
-		@RequestParam(value = "day", required = false) Integer day
+	public GetTimerStatisticsOfYearResponse getTimerStatisticsOfYear(
+		@RequestParam(value = "userId") String userId,
+		@RequestParam(value = "year") int year
 	) {
-		return timerHistoryService.getTimerStatistics(userId, year, month, day);
+		return timerHistoryService.getTimerStatisticsOfYear(userId, year);
 	}
 }

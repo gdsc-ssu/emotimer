@@ -19,10 +19,10 @@ public class TimerServiceApplication {
 		SpringApplication.run(TimerServiceApplication.class, args);
 	}
 
-
 	@Component
 	@RequiredArgsConstructor
 	static class MyApplicationRunner implements ApplicationRunner {
+
 		private final OAuthProperties oAuthProperties;
 
 		@Override
@@ -30,5 +30,4 @@ public class TimerServiceApplication {
 			OAuthVendor.oAuthProperties = oAuthProperties;
 		}
 	}
-
 }
