@@ -1,4 +1,4 @@
-package com.gdsc.timerservice.websocket.dto;
+package com.gdsc.timerservice.websocket.dto.request;
 
 import com.gdsc.timerservice.websocket.enums.TimerOperation;
 import java.time.LocalDateTime;
@@ -11,9 +11,9 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class WebSocketTimerOperation {
+public class WebSocketTimerOperationRequest {
 
-	private long userId;
+	private String userId;
 
 	private LocalDateTime serverTime;
 

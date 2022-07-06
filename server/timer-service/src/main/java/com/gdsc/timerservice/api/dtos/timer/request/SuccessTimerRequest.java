@@ -5,9 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ResetTimerRequest {
+public class SuccessTimerRequest {
 
-	private String userId;
-
-	private long remainedSeconds;
+	private long userId;
 }

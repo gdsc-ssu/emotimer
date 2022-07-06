@@ -2,8 +2,11 @@ package com.gdsc.timerservice.api.entity.timer;
 
 import com.gdsc.timerservice.common.enums.Emoji;
 import java.time.LocalDateTime;
-import javax.persistence.*;
-
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,12 +22,11 @@ import lombok.Setter;
 public class Timer {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column
 	private String timerId;
 
 	@Column
-	private long userId;
+	private String userId;
 
 	@Column
 	private LocalDateTime startedAt;
@@ -35,9 +37,9 @@ public class Timer {
 	@Column
 	private Long remainedSeconds;
 
-	//TODO 유저 Setting 이후 Category로 변경
 	@Column
-	private Emoji category;
+	@Enumerated(EnumType.STRING)
+	private Emoji emoji;
 
 	@Column
 	@Enumerated(EnumType.STRING)

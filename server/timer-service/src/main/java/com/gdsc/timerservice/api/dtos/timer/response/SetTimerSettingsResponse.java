@@ -19,5 +19,5 @@ public class SetTimerSettingsResponse {
 
 	private Long remainedSeconds;
 
-	private Emoji category; // 추후 User Settings 이후에 Emoji 클래스를 Category로 변경할 예정
+	private Emoji emoji;
 }

@@ -6,9 +6,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class StartTimerRequest {
+public class ResumeTimerRequest {
 
 	private String userId;
 
-	private LocalDateTime startTime;
+	private LocalDateTime resumeTime;
 }
