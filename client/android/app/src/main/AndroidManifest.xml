@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.gdsc_timer">
    <application
-        android:label="gdsc_timer"
+        android:label="Emotimer"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
