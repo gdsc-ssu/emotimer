@@ -242,7 +242,9 @@ class _SleekCircularSliderState extends State<SleekCircularSlider> with SingleTi
     }
     RenderBox renderBox = context.findRenderObject() as RenderBox;
     var position = renderBox.globalToLocal(details);
-    final double touchWidth = widget.appearance.progressBarWidth >= 25.0 ? widget.appearance.progressBarWidth : 25.0;
+
+    var range = math.max(widget.appearance.size / 3, 25.0);
+    final double touchWidth = widget.appearance.progressBarWidth >= range ? widget.appearance.progressBarWidth : range;
     if (isPointAlongCircle(position, _painter!.center!, _painter!.radius, touchWidth)) {
       _selectedAngle = coordinatesToRadians(_painter!.center!, position);
       // setup painter with new angle values and update onChange
