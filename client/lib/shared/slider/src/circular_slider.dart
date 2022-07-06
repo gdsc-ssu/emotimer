@@ -89,7 +89,7 @@ class _SleekCircularSliderState extends State<SleekCircularSlider> with SingleTi
   }
 
   void _animate() {
-    if (!widget.appearance.animationEnabled || widget.appearance.spinnerMode) {
+    if (!widget.appearance.animationEnabled || widget.appearance.spinnerMode || _isHandlerSelected) {
       _setupPainter();
       _updateOnChange();
       return;
@@ -165,7 +165,7 @@ class _SleekCircularSliderState extends State<SleekCircularSlider> with SingleTi
     var defaultAngle = _currentAngle ?? widget.angle;
     if (_oldWidgetAngle != null && _oldWidgetAngle != widget.angle) {
       _selectedAngle = null;
-      if(!widget.appearance.animationEnabled) {
+      if(!widget.appearance.animationEnabled || _isHandlerSelected) {
         defaultAngle = widget.angle;
       }
     }
