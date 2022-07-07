@@ -78,11 +78,6 @@ class TimerPage extends StatelessWidget {
             padding: const EdgeInsets.all(24),
             child: TimerButton(
               onStart: () {
-                TimerConnector.connect();
-                Timer.periodic(const Duration(seconds: 1), (timer) {
-                  TimerConnector.test().then((res) => print(res.toString()));
-                });
-
                 timerStore.start(onFinish: () {
                   _confettiController.play();
                   Timer(const Duration(seconds: 1), () {
