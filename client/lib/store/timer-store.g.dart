@@ -9,6 +9,13 @@ part of 'timer-store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$TimerStore on _TimerStore, Store {
+  Computed<int>? _$remainedSecondsComputed;
+
+  @override
+  int get remainedSeconds =>
+      (_$remainedSecondsComputed ??= Computed<int>(() => super.remainedSeconds,
+              name: '_TimerStore.remainedSeconds'))
+          .value;
   Computed<String>? _$remainedTimeComputed;
 
   @override
@@ -84,18 +91,18 @@ mixin _$TimerStore on _TimerStore, Store {
     });
   }
 
-  late final _$remainedSecondsAtom =
-      Atom(name: '_TimerStore.remainedSeconds', context: context);
+  late final _$sessionSecondsAtom =
+      Atom(name: '_TimerStore.sessionSeconds', context: context);
 
   @override
   int get sessionSeconds {
-    _$remainedSecondsAtom.reportRead();
+    _$sessionSecondsAtom.reportRead();
     return super.sessionSeconds;
   }
 
   @override
   set sessionSeconds(int value) {
-    _$remainedSecondsAtom.reportWrite(value, super.sessionSeconds, () {
+    _$sessionSecondsAtom.reportWrite(value, super.sessionSeconds, () {
       super.sessionSeconds = value;
     });
   }
@@ -128,7 +135,7 @@ mixin _$TimerStore on _TimerStore, Store {
   @override
   void resume() {
     final _$actionInfo =
-        _$_TimerStoreActionController.startAction(name: '_TimerStore.restart');
+        _$_TimerStoreActionController.startAction(name: '_TimerStore.resume');
     try {
       return super.resume();
     } finally {
@@ -153,7 +160,8 @@ mixin _$TimerStore on _TimerStore, Store {
 isPaused: ${isPaused},
 startTime: ${startTime},
 duration: ${duration},
-remainedSeconds: ${sessionSeconds},
+sessionSeconds: ${sessionSeconds},
+remainedSeconds: ${remainedSeconds},
 remainedTime: ${remainedTime},
 durationTime: ${durationTime},
 status: ${status},

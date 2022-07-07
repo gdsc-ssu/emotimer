@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:gdsc_timer/api/timer-socket.dart';
 import 'package:gdsc_timer/shared/app_colors.dart';
 import 'package:gdsc_timer/shared/slider/sleek_circular_slider.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +35,6 @@ class TimerPage extends StatelessWidget {
     final timerStore = Provider.of<TimerStore>(context);
     return Observer(builder: (_) {
       OnChange? onChange = (double value) {
-        print("onChange: $value");
         var seconds = (value * maximumSeconds).toInt();
         timerStore.duration = Duration(seconds: max(seconds - seconds % 5, 5));
       };
@@ -78,6 +78,11 @@ class TimerPage extends StatelessWidget {
             padding: const EdgeInsets.all(24),
             child: TimerButton(
               onStart: () {
+                TimerConnector.connect();
+                Timer.periodic(const Duration(seconds: 1), (timer) {
+                  TimerConnector.test().then((res) => print(res.toString()));
+                });
+
                 timerStore.start(onFinish: () {
                   _confettiController.play();
                   Timer(const Duration(seconds: 1), () {
