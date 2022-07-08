@@ -7,11 +7,11 @@ import lombok.Data;
 @Data
 public class TimerStatisticsOfWeekQueryResult extends TimerStatisticsQueryResult {
 
-	private int day;
+	private String dayOfWeek;
 
 	@QueryProjection
-	public TimerStatisticsOfWeekQueryResult(int day, Emoji emoji, long totalSeconds) {
+	public TimerStatisticsOfWeekQueryResult(String dayOfWeek, Emoji emoji, long totalSeconds) {
 		super(emoji, totalSeconds);
-		this.day = day;
+		this.dayOfWeek = dayOfWeek;
 	}
 }

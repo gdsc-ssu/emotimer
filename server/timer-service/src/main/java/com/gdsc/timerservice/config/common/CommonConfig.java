@@ -1,6 +1,5 @@
 package com.gdsc.timerservice.config.common;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,10 +13,14 @@ public class CommonConfig {
 		return new ModelMapper();
 	}
 
-	@Bean
-	public ObjectMapper objectMapper() {
-		return new ObjectMapper();
-	}
+//	@Bean
+//	public ObjectMapper objectMapper() {
+//		ObjectMapper mapper = new ObjectMapper();
+//		mapper.registerModule(new JavaTimeModule());
+//		mapper.registerModule(new JSR310Module());
+//		mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+//		return mapper;
+//	}
 
 	@Bean
 	public RestTemplate restTemplate() {

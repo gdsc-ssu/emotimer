@@ -18,7 +18,7 @@ public class TimerStatistics {
 
 	private Integer week;
 
-	private Integer day;
+	private String dayOfWeek;
 
 	private List<UsageRecord> usageRecords = new ArrayList<>();
 }

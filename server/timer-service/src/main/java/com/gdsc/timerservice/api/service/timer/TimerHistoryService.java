@@ -6,6 +6,7 @@ import com.gdsc.timerservice.api.dtos.timerhistory.request.CreateTimerHistoryReq
 import com.gdsc.timerservice.api.entity.timer.TimerHistory;
 import com.gdsc.timerservice.api.repository.timer.TimerHistoryRepository;
 import java.time.LocalDateTime;
+import java.time.format.TextStyle;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +41,7 @@ public class TimerHistoryService {
 		int year = now.getYear();
 		int month = now.getMonth().getValue();
 		int day = now.getDayOfMonth();
+		String dayOfWeek = now.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.US);
 
 		WeekOfMonth weekOfMonth = getCurrentWeekOfMonth(year, month, day);
 
@@ -51,6 +53,7 @@ public class TimerHistoryService {
 			.monthForStatistics(weekOfMonth.getMonth())
 			.week(weekOfMonth.getWeek())
 			.day(day)
+			.dayOfWeek(dayOfWeek)
 			.spentSeconds(createTimerHistoryRequest.getSpentTime())
 			.succeed(createTimerHistoryRequest.isSucceed())
 			.emoji(createTimerHistoryRequest.getEmoji()).build();
