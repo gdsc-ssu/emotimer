@@ -78,9 +78,7 @@ public class OAuth2Service {
     public TokenResponse socialJoin(String code, String vendor) {
         OAuthRetriever oAuthRetriever = oAuthRetrieverFactory.getOAuthRetrieverByVendor(vendor);
         String userInfo = oAuthRetriever.getUserInfo(code);
-        //TODO user 가입
         User oAuthUser = createOAuthUser(userInfo, ProviderType.get(vendor));
-        //TODO token 생성
         return generateToken(oAuthUser.getUuid(), userInfo);
     }
 

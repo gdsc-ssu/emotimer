@@ -62,11 +62,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         // access token 생성
         Date now = new Date();
         Date accessExpiry = new Date(now.getTime() + appProperties.getAuth().getTokenExpiry());
-        AuthToken accessToken = tokenProvider.createAuthToken(user.getUserId(), user.getEmail(), accessExpiry);
+        AuthToken accessToken = tokenProvider.createAuthToken(user.getUuid(), user.getEmail(), accessExpiry);
 
         // refresh token 생성
         Date refreshExpiry = new Date(now.getTime() + appProperties.getAuth().getRefreshTokenExpiry());
-        AuthToken refreshToken = tokenProvider.createAuthToken(user.getUserId(), user.getEmail(), refreshExpiry);
+        AuthToken refreshToken = tokenProvider.createAuthToken(user.getUuid(), user.getEmail(), refreshExpiry);
 
         // refresh token DB 에 저장
         Optional<UserRefreshToken> userRefreshToken = userRefreshTokenRepository.findById(user.getUserId());
@@ -76,7 +76,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             token.setRefreshToken(refreshToken.getToken());
         } else { // 기존에 리프레시 토큰을 한번도 발급받지 않은 유저, 즉 현재 처음으로 소셜로그인하는 경우, refresh token 신규 저장.
             UserRefreshToken newToken = UserRefreshToken.builder()
-                    .user(user)
+                    .uuid(user.getUuid())
                     .email(user.getEmail())
                     .refreshToken(refreshToken.getToken())
                     .build();

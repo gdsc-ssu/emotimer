@@ -28,8 +28,8 @@ public class AuthTokenProvider {
     private final AppProperties appProperties;
     private final UserRepository userRepository;
 
-    public AuthToken createAuthToken(Long id, String email, Date expiry) {
-        return new AuthToken(appProperties, id, email, expiry);
+    public AuthToken createAuthToken(String uuid, String email, Date expiry) {
+        return new AuthToken(appProperties, uuid, email, expiry);
     }
 
     public AuthToken convertAuthToken(String token) {

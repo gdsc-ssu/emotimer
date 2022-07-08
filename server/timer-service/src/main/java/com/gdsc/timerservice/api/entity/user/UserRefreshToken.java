@@ -14,9 +14,8 @@ public class UserRefreshToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(unique = true, nullable = false)
+    private String uuid;
 
     @NotNull
     private String email;

@@ -52,7 +52,6 @@ public class KakaoOAuthRetriever implements OAuthRetriever {
         params.add("grant_type", "authorization_code");
         params.add("client_id", oAuthProperties.getKakaoClientId());
         params.add("client_secret", oAuthProperties.getKakaoClientSecret());
-        //TODO 이거 나중에 바꾸기
         params.add("code", code);
 
         // HttpHeader 와 HttpBody 를 하나의 오브젝트에 담기

@@ -54,7 +54,6 @@ public class AppleOAuthRetriever implements OAuthRetriever {
         params.add("client_secret", oAuthProperties.getAppleClientSecret());
         params.add("code", code);
         params.add("grant_type", "authorization_code");
-        //TODO redirect_url 살펴보기 (Apple 문서 보기)
         return new HttpEntity<>(params, headers);
     }
 

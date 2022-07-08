@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -16,6 +17,10 @@ import java.util.List;
 public class AppProperties {
     private final Auth auth = new Auth();
     private final OAuth2 oAuth2 = new OAuth2();
+
+    public Date getTokenExpiry() {
+        return new Date(new Date().getTime() + getAuth().getTokenExpiry());
+    }
 
     @Getter
     @Setter

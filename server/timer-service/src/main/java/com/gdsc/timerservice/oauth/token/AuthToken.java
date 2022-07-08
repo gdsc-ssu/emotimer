@@ -16,15 +16,6 @@ public class AuthToken {
 
     private final AppProperties appProperties;
 
-    //AuthToken(Long id, String email, Date expiry) {
-    //    this.token = createAuthToken(id, email, RoleType.USER, expiry);
-    //    this.appProperties = appProperties;
-    //}
-
-//    AuthToken(String token) {
-//        this.token = token;
-//    }
-
     public AuthToken(AppProperties appProperties) {
         this.appProperties = appProperties;
     }
@@ -35,15 +26,15 @@ public class AuthToken {
         return authToken;
     }
 
-    public AuthToken(AppProperties appProperties, Long id, String email, Date expiry) {
+    public AuthToken(AppProperties appProperties, String uuid, String email, Date expiry) {
         this.appProperties = appProperties;
-        this.token = createAuthToken(id, email, RoleType.USER, expiry);
+        this.token = createAuthToken(uuid, email, RoleType.USER, expiry);
     }
 
 
-    private String createAuthToken(Long id, String email, RoleType role, Date expiry) {
+    private String createAuthToken(String uuid, String email, RoleType role, Date expiry) {
         Claims claims = Jwts.claims().setSubject(email);
-        claims.put("id", id);
+        claims.put("id", uuid);
         claims.put("role", role);
         return Jwts.builder()
                 .setClaims(claims)
