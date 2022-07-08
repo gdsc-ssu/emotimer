@@ -18,8 +18,11 @@ public class TimerHistoryController {
 	@GetMapping("")
 	public GetTimerStatisticsOfYearResponse getTimerStatisticsOfYear(
 		@RequestParam(value = "userId") String userId,
-		@RequestParam(value = "year") int year
+		@RequestParam(value = "year") int year,
+		@RequestParam(value = "month", required = false) Integer month,
+		@RequestParam(value = "week", required = false) Integer week
+
 	) {
-		return timerHistoryService.getTimerStatisticsOfYear(userId, year);
+		return new GetTimerStatisticsOfYearResponse(timerHistoryService.getTimerStatisticsOfYear(userId, year, month, week));
 	}
 }

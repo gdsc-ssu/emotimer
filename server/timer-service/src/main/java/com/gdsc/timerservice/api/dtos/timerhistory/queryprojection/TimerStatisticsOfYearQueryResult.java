@@ -5,18 +5,13 @@ import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 
 @Data
-public class QueryForTimerStatisticsOfYear {
+public class TimerStatisticsOfYearQueryResult extends TimerStatisticsQueryResult {
 
 	private int month;
 
-	private Emoji emoji;
-
-	private long totalSeconds;
-
 	@QueryProjection
-	public QueryForTimerStatisticsOfYear(int month, Emoji emoji, long totalSeconds) {
+	public TimerStatisticsOfYearQueryResult(int month, Emoji emoji, long totalSeconds) {
+		super(emoji, totalSeconds);
 		this.month = month;
-		this.emoji = emoji;
-		this.totalSeconds = totalSeconds;
 	}
 }

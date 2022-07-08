@@ -19,7 +19,7 @@ public class WebSocketTimerOperator {
 			.serverTime(timerOperation.getServerTime())
 			.timerOperation(timerOperation.getTimerOperation()).build();
 
-		messagingTemplate.convertAndSend("sub/timer/" + timerOperation.getUserId(), response);
+		messagingTemplate.convertAndSend("/sub/timer/" + timerOperation.getUserId(), response);
 	}
 
 	public void changeTimerSetting(WebSocketChangeTimerSettingsRequest timerSettings) {
@@ -27,6 +27,6 @@ public class WebSocketTimerOperator {
 			.totalTimeSeconds(timerSettings.getTotalTimeSeconds())
 			.emoji(timerSettings.getEmoji()).build();
 
-		messagingTemplate.convertAndSend("sub/timer/" + timerSettings.getUserId(), response);
+		messagingTemplate.convertAndSend("/sub/timer/" + timerSettings.getUserId(), response);
 	}
 }
