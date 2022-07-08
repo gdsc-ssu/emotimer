@@ -39,9 +39,9 @@ public class TimerService {
 
 	private final TimerHistoryService timerHistoryService;
 
-	public SetTimerSettingsResponse setTimerSettings(SetTimerSettingsRequest setTimerSettingsRequest) {
+	public SetTimerSettingsResponse setTimerSettings(SetTimerSettingsRequest setTimerSettingsRequest, String userId) {
 		Timer timer;
-		timer = timerRepository.findByUserId(setTimerSettingsRequest.getUserId()).orElse(null);
+		timer = timerRepository.findByUserId(userId).orElse(null);
 
 		if (timer != null) {
 			timer.setTotalTimeSeconds(setTimerSettingsRequest.getTotalTime());
@@ -50,7 +50,7 @@ public class TimerService {
 			timer.setTimerStatus(READY);
 
 			WebSocketChangeTimerSettingsRequest changeTimerSettingsRequest = WebSocketChangeTimerSettingsRequest.builder()
-				.userId(setTimerSettingsRequest.getUserId())
+				.userId(userId)
 				.totalTimeSeconds(setTimerSettingsRequest.getTotalTime())
 				.emoji(setTimerSettingsRequest.getEmoji()).build();
 
@@ -65,7 +65,7 @@ public class TimerService {
 
 		timer = Timer.builder()
 			.timerId(UUID.randomUUID().toString())
-			.userId(setTimerSettingsRequest.getUserId())
+			.userId(userId)
 			.totalTimeSeconds(setTimerSettingsRequest.getTotalTime())
 			.remainedSeconds(setTimerSettingsRequest.getTotalTime())
 			.emoji(setTimerSettingsRequest.getEmoji())
@@ -90,20 +90,20 @@ public class TimerService {
 			.timerStatus(timer.getTimerStatus()).build();
 	}
 
-	public void startTimer(StartTimerRequest startTimerRequest) {
-		Timer timer = timerRepository.findByUserId(startTimerRequest.getUserId()).orElseThrow(() -> new NoSuchElementException()); // Custom한 Exception을 만드는 것이 나을지 고민
+	public void startTimer(StartTimerRequest startTimerRequest, String userId) {
+		Timer timer = timerRepository.findByUserId(userId).orElseThrow(() -> new NoSuchElementException()); // Custom한 Exception을 만드는 것이 나을지 고민
 		timer.setStartedAt(startTimerRequest.getStartTime());
 		timer.setTimerStatus(RUNNING);
 
 		WebSocketTimerOperationRequest webSocketTimerOperationRequest = WebSocketTimerOperationRequest.builder()
 			.timerOperation(TimerOperation.START)
-			.userId(startTimerRequest.getUserId())
+			.userId(userId)
 			.serverTime(startTimerRequest.getStartTime()).build();
 
 		webSocketTimerOperator.operateTimer(webSocketTimerOperationRequest);
 
 		CreateTimerTaskRequest createTimerTaskRequest = CreateTimerTaskRequest.builder()
-			.userId(startTimerRequest.getUserId())
+			.userId(userId)
 			.totalTimeSeconds(timer.getTotalTimeSeconds())
 			.remainedSeconds(timer.getRemainedSeconds())
 			.emoji(timer.getEmoji()).build();
@@ -111,8 +111,8 @@ public class TimerService {
 		timerTaskScheduler.createSuccessTimerTask(createTimerTaskRequest);
 	}
 
-	public void pauseTimer(PauseTimerRequest pauseTimerRequest) {
-		Timer timer = timerRepository.findByUserId(pauseTimerRequest.getUserId()).orElseThrow(() -> new NoSuchElementException()); // Custom한 Exception을 만드는 것이 나을지 고민
+	public void pauseTimer(PauseTimerRequest pauseTimerRequest, String userId) {
+		Timer timer = timerRepository.findByUserId(userId).orElseThrow(() -> new NoSuchElementException()); // Custom한 Exception을 만드는 것이 나을지 고민
 		long startTimeInEpoch = timer.getStartedAt().atZone(ZoneId.systemDefault()).toEpochSecond();
 		long pausedTimeInEpoch = pauseTimerRequest.getPausedTime().atZone(ZoneId.systemDefault()).toEpochSecond();
 		long remainedSeconds = timer.getTotalTimeSeconds() - (pausedTimeInEpoch - startTimeInEpoch);
@@ -122,28 +122,28 @@ public class TimerService {
 
 		WebSocketTimerOperationRequest webSocketTimerOperationRequest = WebSocketTimerOperationRequest.builder()
 			.timerOperation(TimerOperation.PAUSE)
-			.userId(pauseTimerRequest.getUserId())
+			.userId(userId)
 			.serverTime(pauseTimerRequest.getPausedTime()).build();
 
 		webSocketTimerOperator.operateTimer(webSocketTimerOperationRequest);
 
-		timerTaskScheduler.deleteTimerTask(pauseTimerRequest.getUserId());
+		timerTaskScheduler.deleteTimerTask(userId);
 	}
 
-	public void resumeTimer(ResumeTimerRequest resumeTimerRequest) {
-		Timer timer = timerRepository.findByUserId(resumeTimerRequest.getUserId()).orElseThrow(() -> new NoSuchElementException()); // Custom한 Exception을 만드는 것이 나을지 고민
+	public void resumeTimer(ResumeTimerRequest resumeTimerRequest, String userId) {
+		Timer timer = timerRepository.findByUserId(userId).orElseThrow(() -> new NoSuchElementException()); // Custom한 Exception을 만드는 것이 나을지 고민
 		timer.setStartedAt(resumeTimerRequest.getResumeTime());
 		timer.setTimerStatus(RUNNING);
 
 		WebSocketTimerOperationRequest webSocketTimerOperationRequest = WebSocketTimerOperationRequest.builder()
 			.timerOperation(TimerOperation.RESUME)
-			.userId(resumeTimerRequest.getUserId())
+			.userId(userId)
 			.serverTime(resumeTimerRequest.getResumeTime()).build();
 
 		webSocketTimerOperator.operateTimer(webSocketTimerOperationRequest);
 
 		CreateTimerTaskRequest createTimerTaskRequest = CreateTimerTaskRequest.builder()
-			.userId(resumeTimerRequest.getUserId())
+			.userId(userId)
 			.totalTimeSeconds(timer.getTotalTimeSeconds())
 			.remainedSeconds(timer.getRemainedSeconds())
 			.emoji(timer.getEmoji()).build();
@@ -151,22 +151,22 @@ public class TimerService {
 		timerTaskScheduler.createSuccessTimerTask(createTimerTaskRequest);
 	}
 
-	public void resetTimer(ResetTimerRequest resetTimerRequest) {
-		Timer timer = timerRepository.findByUserId(resetTimerRequest.getUserId()).orElseThrow(() -> new NoSuchElementException()); // Custom한 Exception을 만드는 것이 나을지 고민)
+	public void resetTimer(ResetTimerRequest resetTimerRequest, String userId) {
+		Timer timer = timerRepository.findByUserId(userId).orElseThrow(() -> new NoSuchElementException()); // Custom한 Exception을 만드는 것이 나을지 고민)
 		timer.setStartedAt(null);
 		timer.setRemainedSeconds(timer.getTotalTimeSeconds());
 		timer.setTimerStatus(READY);
 
 		WebSocketTimerOperationRequest webSocketTimerOperationRequest = WebSocketTimerOperationRequest.builder()
 			.timerOperation(TimerOperation.RESET)
-			.userId(resetTimerRequest.getUserId()).build();
+			.userId(userId).build();
 
 		webSocketTimerOperator.operateTimer(webSocketTimerOperationRequest);
 
-		timerTaskScheduler.deleteTimerTask(resetTimerRequest.getUserId());
+		timerTaskScheduler.deleteTimerTask(userId);
 
 		CreateTimerHistoryRequest createTimerHistoryRequest = CreateTimerHistoryRequest.builder()
-			.userId(resetTimerRequest.getUserId())
+			.userId(userId)
 			.spentTime(timer.getTotalTimeSeconds() - resetTimerRequest.getRemainedSeconds())
 			.succeed(false)
 			.emoji(timer.getEmoji()).build();

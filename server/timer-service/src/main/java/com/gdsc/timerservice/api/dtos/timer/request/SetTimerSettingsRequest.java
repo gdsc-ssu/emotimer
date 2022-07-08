@@ -14,8 +14,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class SetTimerSettingsRequest {
 
-	private String userId;
-
 	private long totalTime;
 
 	private Emoji emoji;

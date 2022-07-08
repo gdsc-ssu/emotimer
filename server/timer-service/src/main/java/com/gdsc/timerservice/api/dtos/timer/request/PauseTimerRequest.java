@@ -8,7 +8,5 @@ import lombok.Setter;
 @Setter
 public class PauseTimerRequest {
 
-	private String userId;
-
 	private LocalDateTime pausedTime;
 }

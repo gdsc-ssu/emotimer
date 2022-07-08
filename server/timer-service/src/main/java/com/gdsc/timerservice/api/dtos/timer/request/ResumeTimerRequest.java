@@ -8,7 +8,5 @@ import lombok.Setter;
 @Setter
 public class ResumeTimerRequest {
 
-	private String userId;
-
 	private LocalDateTime resumeTime;
 }
