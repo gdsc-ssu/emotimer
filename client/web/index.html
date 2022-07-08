@@ -37,6 +37,10 @@
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
   <script>
+    // flutter web auth :
+    window.opener.postMessage({
+      'flutter-web-auth': window.location.href
+    }, window.location.origin);
     var serviceWorkerVersion = null;
     var scriptLoaded = false;
     function loadMainDartJs() {
