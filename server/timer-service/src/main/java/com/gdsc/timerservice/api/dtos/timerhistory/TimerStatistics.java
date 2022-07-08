@@ -20,5 +20,5 @@ public class TimerStatistics {
 
 	private Integer day;
 
-	private List<EmojiAndTotalTime> emojiAndTotalTimeList = new ArrayList<>();
+	private List<UsageRecord> usageRecords = new ArrayList<>();
 }

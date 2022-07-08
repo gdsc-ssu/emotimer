@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class EmojiAndTotalTime {
+public class UsageRecord {
 
 	private Emoji emoji;
 

@@ -3,8 +3,8 @@ package com.gdsc.timerservice.api.repository.timer;
 
 import static com.gdsc.timerservice.api.entity.timer.QTimerHistory.timerHistory;
 
-import com.gdsc.timerservice.api.dtos.timerhistory.EmojiAndTotalTime;
 import com.gdsc.timerservice.api.dtos.timerhistory.TimerStatistics;
+import com.gdsc.timerservice.api.dtos.timerhistory.UsageRecord;
 import com.gdsc.timerservice.api.dtos.timerhistory.queryprojection.QTimerStatisticsOfMonthQueryResult;
 import com.gdsc.timerservice.api.dtos.timerhistory.queryprojection.QTimerStatisticsOfWeekQueryResult;
 import com.gdsc.timerservice.api.dtos.timerhistory.queryprojection.QTimerStatisticsOfYearQueryResult;
@@ -40,7 +40,7 @@ public class TimerHistoryRepositoryImpl implements TimerHistoryRepositoryCustom 
 		List<TimerStatistics> timerStatistics = new ArrayList<>();
 
 		queryResult.stream().collect(Collectors.groupingBy(TimerStatisticsOfYearQueryResult::getMonth))
-			.forEach((month, queryResults) -> timerStatistics.add(TimerStatistics.builder().month(month).emojiAndTotalTimeList(makeTimerStatisticsList(queryResults)).build()));
+			.forEach((month, queryResults) -> timerStatistics.add(TimerStatistics.builder().month(month).usageRecords(makeTimerStatisticsList(queryResults)).build()));
 
 		return timerStatistics;
 	}
@@ -58,7 +58,7 @@ public class TimerHistoryRepositoryImpl implements TimerHistoryRepositoryCustom 
 		List<TimerStatistics> statisticsList = new ArrayList<>();
 
 		queryResult.stream().collect(Collectors.groupingBy(TimerStatisticsOfMonthQueryResult::getWeek))
-			.forEach((week, queryResults) -> statisticsList.add(TimerStatistics.builder().week(week).emojiAndTotalTimeList(makeTimerStatisticsList(queryResults)).build()));
+			.forEach((week, queryResults) -> statisticsList.add(TimerStatistics.builder().week(week).usageRecords(makeTimerStatisticsList(queryResults)).build()));
 
 		return statisticsList;
 	}
@@ -76,13 +76,13 @@ public class TimerHistoryRepositoryImpl implements TimerHistoryRepositoryCustom 
 		List<TimerStatistics> statisticsList = new ArrayList<>();
 
 		queryResult.stream().collect(Collectors.groupingBy(TimerStatisticsOfWeekQueryResult::getDay))
-			.forEach((day, queryResults) -> statisticsList.add(TimerStatistics.builder().day(day).emojiAndTotalTimeList(makeTimerStatisticsList(queryResults)).build()));
+			.forEach((day, queryResults) -> statisticsList.add(TimerStatistics.builder().day(day).usageRecords(makeTimerStatisticsList(queryResults)).build()));
 
 		return statisticsList;
 	}
 
-	private <T extends TimerStatisticsQueryResult> List<EmojiAndTotalTime> makeTimerStatisticsList(List<T> list) {
-		return list.stream().map(each -> new EmojiAndTotalTime(each.getEmoji(), each.getTotalSeconds())).collect(Collectors.toList());
+	private <T extends TimerStatisticsQueryResult> List<UsageRecord> makeTimerStatisticsList(List<T> list) {
+		return list.stream().map(each -> new UsageRecord(each.getEmoji(), each.getTotalSeconds())).collect(Collectors.toList());
 	}
 
 	/**
