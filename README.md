@@ -15,11 +15,11 @@
     - SignUp
 - Timer
   - 속성
-    - Status : Ready / Running / Paused / Succeeded / Failed
+    - Status : Ready / Running / Paused
     - StartedAt : DateTime
     - RemainedSeconds : Long
     - TotalSeconds : Long
-    - Category : CategoryId
+    - Emoji : EmojiId
   - 행위
     - Start
     - Pause
@@ -27,16 +27,12 @@
 - Timer History
   - 속성
     - RecordedAt : DateTime
-    - TotalMilliSeconds : Long
-    - RemainedMilliSeconds : Long
+    - TotalSeconds : Long
+    - RemainedSeconds : Long
     - Status : Failed / Succeeded
-    - Category : CategoryId
-- Timer Category
-  - 속성
-    - CategoryId : `EMOJI-ID`
-    - Label : String
-  - 행위
-    - SetLabel
+    - Emoji : EmojiId
+    
+- EMOJI(enum)
 
 ### Contribute guide
 
@@ -47,19 +43,3 @@
   3. 리뷰가 늦어지거나 별도의 리뷰가 필요가 없다면 Merge 합니다. 
   4. 가급적 Squash Merge를 사용하나, 중첩된 브랜치가 있거나, 단일 커밋 브랜치의 경우에는 Rebase merge / Fast-forward merge를 사용합니다. 
 
-
-## Server 
-
-// TBD
-
-### Database guide
-
-1. API 상에 노출이 필요한 모든 ID는 가급적 string(`varchar(63)`)로 사용합니다. 단, History성 데이터 테이블은 `Long` 이나 `Guid`를 사용해도 괜찮습니다.
-
-### Project structure
-
-### Guide
-
-## Client
-
-// TBD

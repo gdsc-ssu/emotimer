@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
@@ -20,7 +21,7 @@ abstract class _TimerStore with Store {
         name: "Seconds ticker",
         onObserved: () {
           _timer = Timer.periodic(const Duration(milliseconds: 100), (Timer timer) {
-            if (remainedSeconds == 0) {
+            if (remainedSeconds <= 0) {
               Timer(const Duration(milliseconds: 300), () {
                 _onFinish?.call();
                 reset();
@@ -78,7 +79,7 @@ abstract class _TimerStore with Store {
   @computed
   double get percent {
     _atom.reportObserved();
-    return 1 - remainedSeconds / duration.inSeconds;
+    return min(1 - remainedSeconds / duration.inSeconds, 1);
   }
 
   @action

@@ -65,8 +65,8 @@ Map<String, dynamic> _$GetTimerResponseToJson(GetTimerResponse instance) =>
       'startedAt': instance.startedAt.toIso8601String(),
       'totalTimeSeconds': instance.totalTimeSeconds,
       'remainedSeconds': instance.remainedSeconds,
-      'emoji': _$EmojiEnumMap[instance.emoji],
-      'timerStatus': _$TimerStatusEnumMap[instance.timerStatus],
+      'emoji': _$EmojiEnumMap[instance.emoji]!,
+      'timerStatus': _$TimerStatusEnumMap[instance.timerStatus]!,
     };
 
 const _$TimerStatusEnumMap = {
