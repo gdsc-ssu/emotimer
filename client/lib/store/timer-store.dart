@@ -11,11 +11,28 @@ const defaultDuration = Duration(minutes: 25);
 
 abstract class _TimerStore with Store {
   Timer? _timer;
+  late Atom _atom;
+  VoidCallback? _onFinish;
 
   _TimerStore() {
-    _dispose = reaction((_) => duration, (Duration newValue) {
-      remainedSeconds = newValue.inSeconds;
-    });
+    _dispose = reaction((_) => duration, (Duration newValue) => sessionSeconds = newValue.inSeconds);
+    _atom = Atom(
+        name: "Seconds ticker",
+        onObserved: () {
+          _timer = Timer.periodic(const Duration(milliseconds: 100), (Timer timer) {
+            if (remainedSeconds == 0) {
+              Timer(const Duration(milliseconds: 300), () {
+                _onFinish?.call();
+                reset();
+              });
+              _timer?.cancel();
+            }
+            _atom.reportChanged();
+          });
+        },
+        onUnobserved: () {
+          _timer?.cancel();
+        });
   }
 
   @observable
@@ -30,10 +47,17 @@ abstract class _TimerStore with Store {
   late ReactionDisposer _dispose;
 
   @observable
-  int remainedSeconds = defaultDuration.inSeconds;
+  int sessionSeconds = defaultDuration.inSeconds;
+
+  @computed
+  int get remainedSeconds {
+    _atom.reportObserved();
+    return startTime == null ? sessionSeconds : sessionSeconds - DateTime.now().difference(startTime!).inSeconds;
+  }
 
   @computed
   String get remainedTime {
+    _atom.reportObserved();
     return Duration(seconds: remainedSeconds).toString().split(".")[0];
   }
 
@@ -45,7 +69,7 @@ abstract class _TimerStore with Store {
   @computed
   TimerStatus get status {
     return isPaused
-        ? remainedSeconds == duration.inSeconds
+        ? sessionSeconds == duration.inSeconds
             ? TimerStatus.ready
             : TimerStatus.paused
         : TimerStatus.running;
@@ -53,53 +77,40 @@ abstract class _TimerStore with Store {
 
   @computed
   double get percent {
-    print(1 - remainedSeconds / duration.inSeconds);
+    _atom.reportObserved();
     return 1 - remainedSeconds / duration.inSeconds;
   }
 
   @action
-  void start({int? sessionSeconds, VoidCallback? onFinish}) {
-    print(remainedSeconds);
-    if (_timer != null) {
-      return;
-    }
-
+  void start({int? durationSeconds, VoidCallback? onFinish}) {
+    _onFinish = onFinish;
     isPaused = false;
     startTime = DateTime.now();
-    if (sessionSeconds != null) {
-      duration = Duration(seconds: sessionSeconds);
-      remainedSeconds = duration.inSeconds;
+    if (durationSeconds != null) {
+      duration = Duration(seconds: durationSeconds);
+      sessionSeconds = duration.inSeconds;
     }
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      print("TIMER: $remainedTime, paused: $isPaused");
-      if (isPaused) {
-        return;
-      }
-
-      if (remainedSeconds == 0) {
-        reset();
-        onFinish?.call();
-        return;
-      }
-      remainedSeconds = remainedSeconds - 1;
-    });
   }
 
   @action
   void pause() {
+    sessionSeconds = remainedSeconds;
     isPaused = true;
+    startTime = null;
   }
 
   @action
-  void restart() {
+  void resume() {
     isPaused = false;
+    startTime = DateTime.now();
   }
 
   @action
   void reset() {
+    _onFinish = null;
     isPaused = true;
     startTime = null;
-    remainedSeconds = duration.inSeconds;
+    sessionSeconds = duration.inSeconds;
     _timer?.cancel();
     _timer = null;
   }

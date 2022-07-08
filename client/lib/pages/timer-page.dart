@@ -4,9 +4,10 @@ import 'dart:math';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:gdsc_timer/api/timer-socket.dart';
 import 'package:gdsc_timer/shared/app_colors.dart';
+import 'package:gdsc_timer/shared/slider/sleek_circular_slider.dart';
 import 'package:provider/provider.dart';
-import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
 import '../store/timer-store.dart';
 
@@ -17,10 +18,7 @@ final appearance = CircularSliderAppearance(
   size: 300,
   customWidths: CustomSliderWidths(progressBarWidth: 12, trackWidth: 12, handlerSize: 12, shadowWidth: 2),
   customColors: CustomSliderColors(
-    progressBarColors: [
-      Color(0xff242934),
-      AppColors.primary,
-    ],
+    progressBarColors: [AppColors.primary, Color(0xff1b2944)],
     dotColor: AppColors.primary,
     trackColor: Colors.black12,
   ),
@@ -30,25 +28,23 @@ final ConfettiController _confettiController = ConfettiController(
 );
 
 class TimerPage extends StatelessWidget {
+  final maximumSeconds = 3600;
+
   @override
   Widget build(BuildContext context) {
     final timerStore = Provider.of<TimerStore>(context);
     return Observer(builder: (_) {
-      var maximumSeconds = 3600;
-
       OnChange? onChange = (double value) {
         var seconds = (value * maximumSeconds).toInt();
         timerStore.duration = Duration(seconds: max(seconds - seconds % 5, 5));
       };
       var displayTime = timerStore.durationTime;
       var currentValue = timerStore.duration.inSeconds.toDouble() / maximumSeconds;
-
       if (timerStore.status != TimerStatus.ready) {
         onChange = null;
         displayTime = timerStore.remainedTime;
         currentValue = timerStore.percent;
       }
-
       return Scaffold(
           body: Center(
               child: Column(
@@ -90,7 +86,7 @@ class TimerPage extends StatelessWidget {
                 });
               },
               onReset: () => timerStore.reset(),
-              onResume: () => timerStore.restart(),
+              onResume: () => timerStore.resume(),
               onPause: () => timerStore.pause(),
             ),
           )
