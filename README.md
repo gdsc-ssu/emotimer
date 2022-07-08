@@ -15,11 +15,11 @@
     - SignUp
 - Timer
   - 속성
-    - Status : Ready / Running / Paused / Succeeded / Failed
+    - Status : Ready / Running / Paused
     - StartedAt : DateTime
     - RemainedSeconds : Long
     - TotalSeconds : Long
-    - Category : CategoryId
+    - Emoji : EmojiId
   - 행위
     - Start
     - Pause
@@ -27,16 +27,12 @@
 - Timer History
   - 속성
     - RecordedAt : DateTime
-    - TotalMilliSeconds : Long
-    - RemainedMilliSeconds : Long
+    - TotalSeconds : Long
+    - RemainedSeconds : Long
     - Status : Failed / Succeeded
-    - Category : CategoryId
-- Timer Category
-  - 속성
-    - CategoryId : `EMOJI-ID`
-    - Label : String
-  - 행위
-    - SetLabel
+    - Emoji : EmojiId
+    
+- EMOJI(enum)
 
 ### Contribute guide
 
