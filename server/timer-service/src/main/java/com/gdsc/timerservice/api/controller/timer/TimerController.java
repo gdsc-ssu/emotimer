@@ -8,12 +8,13 @@ import com.gdsc.timerservice.api.dtos.timer.request.StartTimerRequest;
 import com.gdsc.timerservice.api.dtos.timer.response.GetServerTimeResponse;
 import com.gdsc.timerservice.api.dtos.timer.response.GetTimerResponse;
 import com.gdsc.timerservice.api.dtos.timer.response.SetTimerSettingsResponse;
+import com.gdsc.timerservice.api.entity.user.User;
 import com.gdsc.timerservice.api.service.timer.TimerService;
+import com.gdsc.timerservice.common.annotation.CurrentUser;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,36 +33,36 @@ public class TimerController {
 	}
 
 	@PostMapping("/set")
-	public ResponseEntity<SetTimerSettingsResponse> setTimerSettings(@RequestBody SetTimerSettingsRequest setTimerSettingsRequest) {
-		return ResponseEntity.ok(timerService.setTimerSettings(setTimerSettingsRequest));
+	public ResponseEntity<SetTimerSettingsResponse> setTimerSettings(@CurrentUser User user, @RequestBody SetTimerSettingsRequest setTimerSettingsRequest) {
+		return ResponseEntity.ok(timerService.setTimerSettings(setTimerSettingsRequest, user.getUserId()));
 	}
 
-	@GetMapping("/{userId}")
-	public ResponseEntity<GetTimerResponse> getTimer(@PathVariable String userId) {
-		return ResponseEntity.ok(timerService.getTimer(userId));
+	@GetMapping("")
+	public ResponseEntity<GetTimerResponse> getTimer(@CurrentUser User user) {
+		return ResponseEntity.ok(timerService.getTimer(user.getUserId()));
 	}
 
 	@PostMapping("/start")
-	public ResponseEntity startTimer(@RequestBody StartTimerRequest startTimerRequest) {
-		timerService.startTimer(startTimerRequest);
+	public ResponseEntity startTimer(@RequestBody StartTimerRequest startTimerRequest, @CurrentUser User user) {
+		timerService.startTimer(startTimerRequest, user.getUserId());
 		return ResponseEntity.ok("");
 	}
 
 	@PostMapping("/pause")
-	public ResponseEntity pauseTimer(@RequestBody PauseTimerRequest pauseTimerRequest) {
-		timerService.pauseTimer(pauseTimerRequest);
+	public ResponseEntity pauseTimer(@RequestBody PauseTimerRequest pauseTimerRequest, @CurrentUser User user) {
+		timerService.pauseTimer(pauseTimerRequest, user.getUserId());
 		return ResponseEntity.ok("");
 	}
 
 	@PostMapping("/resume")
-	public ResponseEntity resumeTimer(@RequestBody ResumeTimerRequest resumeTimerRequest) {
-		timerService.resumeTimer(resumeTimerRequest);
+	public ResponseEntity resumeTimer(@RequestBody ResumeTimerRequest resumeTimerRequest, @CurrentUser User user) {
+		timerService.resumeTimer(resumeTimerRequest, user.getUserId());
 		return ResponseEntity.ok("");
 	}
 
 	@PostMapping("/reset")
-	public ResponseEntity resetTimer(@RequestBody ResetTimerRequest resetTimerRequest) {
-		timerService.resetTimer(resetTimerRequest);
+	public ResponseEntity resetTimer(@RequestBody ResetTimerRequest resetTimerRequest, @CurrentUser User user) {
+		timerService.resetTimer(resetTimerRequest, user.getUserId());
 		return ResponseEntity.ok("");
 	}
 }

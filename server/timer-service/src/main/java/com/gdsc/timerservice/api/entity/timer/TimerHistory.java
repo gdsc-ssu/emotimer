@@ -56,6 +56,9 @@ public class TimerHistory {
 	private int day;
 
 	@Column
+	private String dayOfWeek;
+
+	@Column
 	private long spentSeconds;
 
 	@Column

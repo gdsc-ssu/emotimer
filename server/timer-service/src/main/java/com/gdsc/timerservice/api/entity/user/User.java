@@ -2,15 +2,21 @@ package com.gdsc.timerservice.api.entity.user;
 
 import com.gdsc.timerservice.oauth.entity.ProviderType;
 import com.gdsc.timerservice.oauth.entity.RoleType;
-import lombok.*;
+import java.time.LocalDateTime;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import net.minidev.json.annotate.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -18,67 +24,58 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "USER")
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "USER_ID")
-    private Long userId;
 
-    @NotNull
-    @Size(max = 512)
-    @Column(name = "EMAIL", unique = true) // 이메일은 유일
-    private String email;
+	@Id
+	private String userId;
 
-    @JsonIgnore
-    @NotNull
-    @Size(max = 128)
-    @Column(name = "PASSWORD")
-    private String password;
+	@NotNull
+	@Size(max = 512)
+	private String email;
 
-//    @NotNull
-    @Size(max = 100)
-    @Column(name = "USERNAME")
-    private String username;
+	@JsonIgnore
+	@NotNull
+	@Size(max = 128)
+	private String password;
 
-//    @NotNull
-//    @Column(name = "PROFILE_IMAGE_URL")
-//    @Size(max = 512)
-//    private String profileImageUrl;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "PROVIDER_TYPE", length = 20)
-    private ProviderType providerType;
+	@Size(max = 100)
+	private String username;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "ROLE_TYPE", length = 20)
-    private RoleType roleType;
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private ProviderType providerType;
 
-    @NotNull
-    @Column(name = "UPDATED_AT")
-    @CreatedDate
-    private LocalDateTime updatedAt;
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private RoleType roleType;
 
-    @NotNull
-    @LastModifiedDate
-    @Column(name = "CREATED_AT")
-    private LocalDateTime createdAt;
+	@NotNull
+	@CreatedDate
+	private LocalDateTime updatedAt;
 
-    @Column(name = "IMAGE_URL")
-    private String imageUrl;
+	@NotNull
+	@LastModifiedDate
+	private LocalDateTime createdAt;
 
-    @Builder
-    public User(String email, String password, String username, ProviderType providerType, RoleType roleType){
-        this.email = email;
-        this.password = password;
-        this.username = username;
-        this.providerType = providerType;
-        this.roleType = roleType;
-    }
+	private String imageUrl;
 
-    public User(Long userId) {
-        this.userId = userId;
-    }
+	@Builder
+	public User(String email, String password, String username, ProviderType providerType, RoleType roleType) {
+		this.email = email;
+		this.password = password;
+		this.username = username;
+		this.providerType = providerType;
+		this.roleType = roleType;
+	}
+
+	public User(String userId) {
+		this.userId = userId;
+	}
+
+	public User(User user) {
+		this.username = user.getUsername();
+		this.roleType = user.getRoleType();
+		this.email = user.getEmail();
+	}
 }

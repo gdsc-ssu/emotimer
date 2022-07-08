@@ -8,7 +8,5 @@ import lombok.Setter;
 @Setter
 public class StartTimerRequest {
 
-	private String userId;
-
 	private LocalDateTime startTime;
 }
