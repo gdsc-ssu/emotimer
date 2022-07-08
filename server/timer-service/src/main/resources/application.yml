@@ -3,7 +3,6 @@ spring:
   profiles:
     active: local
     include: oauth # application-xxx.properties 파일을 만들면 xxx 라는 프로파일이 생성된다. oauth 프로파일을 include 하겠다.
-  # ??? ?? ??
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DB_URL}
