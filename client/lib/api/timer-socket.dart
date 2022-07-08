@@ -11,7 +11,7 @@ class TimerConnector {
   static void connect() {
     client = StompClient(
         config: StompConfig.SockJS(
-            url: 'http://localhost:8080/ws-timer',
+            url: 'https://emotimer.ml/ws-timer',
             onConnect: (StompFrame frame) {
               print('connected');
               client!.subscribe(
@@ -31,6 +31,6 @@ class TimerConnector {
 
   static Future<SetTimerResponse> test() async {
     var client = TimerApiClient(Dio());
-    return await client.setTimer(SetTimerRequest(userId: "abc", totalTime: 25 * 60, emoji: Emoji.ANGER_SYMBOL));
+    return await client.setTimer(SetTimerRequest(totalTime: 25 * 60, emoji: Emoji.ANGER_SYMBOL));
   }
 }

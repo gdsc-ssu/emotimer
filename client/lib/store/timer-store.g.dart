@@ -43,6 +43,21 @@ mixin _$TimerStore on _TimerStore, Store {
           Computed<double>(() => super.percent, name: '_TimerStore.percent'))
       .value;
 
+  late final _$emojiAtom = Atom(name: '_TimerStore.emoji', context: context);
+
+  @override
+  Emoji get emoji {
+    _$emojiAtom.reportRead();
+    return super.emoji;
+  }
+
+  @override
+  set emoji(Emoji value) {
+    _$emojiAtom.reportWrite(value, super.emoji, () {
+      super.emoji = value;
+    });
+  }
+
   late final _$isPausedAtom =
       Atom(name: '_TimerStore.isPaused', context: context);
 
@@ -107,6 +122,14 @@ mixin _$TimerStore on _TimerStore, Store {
     });
   }
 
+  late final _$currentStateAsyncAction =
+      AsyncAction('_TimerStore.currentState', context: context);
+
+  @override
+  Future<void> currentState() {
+    return _$currentStateAsyncAction.run(() => super.currentState());
+  }
+
   late final _$_TimerStoreActionController =
       ActionController(name: '_TimerStore', context: context);
 
@@ -157,6 +180,7 @@ mixin _$TimerStore on _TimerStore, Store {
   @override
   String toString() {
     return '''
+emoji: ${emoji},
 isPaused: ${isPaused},
 startTime: ${startTime},
 duration: ${duration},

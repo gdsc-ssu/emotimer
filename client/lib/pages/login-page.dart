@@ -71,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
                       url: Uri.https('kauth.kakao.com', '/oauth/authorize', {
                         'response_type': 'code',
                         'client_id': '116cc9d3778c5d9578487bce8f08e024',
-                        'redirect_uri': 'http://localhost:8080/callback/kakao',
+                        'redirect_uri': 'https://emotimer.ml/callback/kakao',
                         'state': clientState,
                       }).toString(),
                       callbackUrlScheme: "emotimer");

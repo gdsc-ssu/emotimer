@@ -40,7 +40,7 @@ class _WeeklyStaticsPageState extends State<WeeklyStaticsPage> {
   @override
   Widget build(BuildContext context) {
     return Statics(
-      isLoading: true,
+      isLoading: false,
       data: widget.data,
       listRankingTitle: "Weekly Ranking",
       ranking: widget.ranking,

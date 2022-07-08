@@ -1,8 +1,13 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:gdsc_timer/domain/emoji.dart';
+import 'package:gdsc_timer/shared/common.dart';
 import 'package:mobx/mobx.dart';
+
+import '../api/timer-api-client.dart';
 
 part 'timer-store.g.dart';
 
@@ -15,7 +20,9 @@ abstract class _TimerStore with Store {
   late Atom _atom;
   VoidCallback? _onFinish;
 
-  _TimerStore() {
+  late TimerApiClient _apiClient;
+
+  _TimerStore(Dio dio) {
     _dispose = reaction((_) => duration, (Duration newValue) => sessionSeconds = newValue.inSeconds);
     _atom = Atom(
         name: "Seconds ticker",
@@ -34,7 +41,13 @@ abstract class _TimerStore with Store {
         onUnobserved: () {
           _timer?.cancel();
         });
+
+    _apiClient = TimerApiClient(dio);
+    currentState();
   }
+
+  @observable
+  Emoji emoji = Emoji.CLOSED_BOOK;
 
   @observable
   bool isPaused = true;
@@ -71,15 +84,51 @@ abstract class _TimerStore with Store {
   TimerStatus get status {
     return isPaused
         ? sessionSeconds == duration.inSeconds
-            ? TimerStatus.ready
-            : TimerStatus.paused
-        : TimerStatus.running;
+            ? TimerStatus.READY
+            : TimerStatus.PAUSED
+        : TimerStatus.RUNNING;
   }
 
   @computed
   double get percent {
     _atom.reportObserved();
     return min(1 - remainedSeconds / duration.inSeconds, 1);
+  }
+
+  @action
+  Future<void> currentState() async {
+    try {
+      var res = await _apiClient.getTimer();
+      switch(res.timerStatus) {
+        case TimerStatus.RUNNING:
+          isPaused = false;
+          startTime = DateTime.now();
+          sessionSeconds =  res.remainedSeconds!;
+          break;
+        case TimerStatus.PAUSED:
+          isPaused = true;
+          startTime = DateTime.now();
+          sessionSeconds =  res.remainedSeconds!;
+          break;
+        case TimerStatus.READY:
+          reset();
+          break;
+      }
+      emoji = res.emoji;
+      duration = Duration(seconds: res.totalTimeSeconds);
+
+    } on DioError catch (e) {
+      logger.e(e);
+      logger.e("Got error : ${e.response?.statusCode} -> ${e.response?.statusMessage}");
+
+      if (e.response?.statusCode == 404) {
+        await update();
+      }
+    }
+  }
+
+  Future<void> update() async {
+    await _apiClient.setTimer(SetTimerRequest(totalTime: duration.inSeconds, emoji: emoji));
   }
 
   @action
@@ -118,7 +167,7 @@ abstract class _TimerStore with Store {
 }
 
 enum TimerStatus {
-  running,
-  paused,
-  ready,
+  RUNNING,
+  PAUSED,
+  READY,
 }

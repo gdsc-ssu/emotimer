@@ -8,14 +8,12 @@ part of 'timer-api-client.dart';
 
 SetTimerRequest _$SetTimerRequestFromJson(Map<String, dynamic> json) =>
     SetTimerRequest(
-      userId: json['userId'] as String,
       totalTime: json['totalTime'] as int,
       emoji: $enumDecodeNullable(_$EmojiEnumMap, json['emoji']),
     );
 
 Map<String, dynamic> _$SetTimerRequestToJson(SetTimerRequest instance) =>
     <String, dynamic>{
-      'userId': instance.userId,
       'totalTime': instance.totalTime,
       'emoji': _$EmojiEnumMap[instance.emoji],
     };
@@ -53,16 +51,18 @@ Map<String, dynamic> _$SetTimerResponseToJson(SetTimerResponse instance) =>
 
 GetTimerResponse _$GetTimerResponseFromJson(Map<String, dynamic> json) =>
     GetTimerResponse(
-      startedAt: DateTime.parse(json['startedAt'] as String),
+      startedAt: json['startedAt'] == null
+          ? null
+          : DateTime.parse(json['startedAt'] as String),
       totalTimeSeconds: json['totalTimeSeconds'] as int,
-      remainedSeconds: json['remainedSeconds'] as int,
+      remainedSeconds: json['remainedSeconds'] as int?,
       emoji: $enumDecode(_$EmojiEnumMap, json['emoji']),
       timerStatus: $enumDecode(_$TimerStatusEnumMap, json['timerStatus']),
     );
 
 Map<String, dynamic> _$GetTimerResponseToJson(GetTimerResponse instance) =>
     <String, dynamic>{
-      'startedAt': instance.startedAt.toIso8601String(),
+      'startedAt': instance.startedAt?.toIso8601String(),
       'totalTimeSeconds': instance.totalTimeSeconds,
       'remainedSeconds': instance.remainedSeconds,
       'emoji': _$EmojiEnumMap[instance.emoji]!,
@@ -70,9 +70,9 @@ Map<String, dynamic> _$GetTimerResponseToJson(GetTimerResponse instance) =>
     };
 
 const _$TimerStatusEnumMap = {
-  TimerStatus.running: 'running',
-  TimerStatus.paused: 'paused',
-  TimerStatus.ready: 'ready',
+  TimerStatus.RUNNING: 'RUNNING',
+  TimerStatus.PAUSED: 'PAUSED',
+  TimerStatus.READY: 'READY',
 };
 
 // **************************************************************************
@@ -83,7 +83,7 @@ const _$TimerStatusEnumMap = {
 
 class _TimerApiClient implements TimerApiClient {
   _TimerApiClient(this._dio, {this.baseUrl}) {
-    baseUrl ??= 'http://localhost:8080';
+    baseUrl ??= 'https://emotimer.ml';
   }
 
   final Dio _dio;
@@ -100,7 +100,7 @@ class _TimerApiClient implements TimerApiClient {
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<SetTimerResponse>(
             Options(method: 'POST', headers: _headers, extra: _extra)
-                .compose(_dio.options, '/v1/timer/set',
+                .compose(_dio.options, '/api/timer',
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = SetTimerResponse.fromJson(_result.data!);
@@ -108,7 +108,7 @@ class _TimerApiClient implements TimerApiClient {
   }
 
   @override
-  Future<GetTimerResponse> getTimer(userId) async {
+  Future<GetTimerResponse> getTimer() async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
@@ -116,7 +116,7 @@ class _TimerApiClient implements TimerApiClient {
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<GetTimerResponse>(
             Options(method: 'GET', headers: _headers, extra: _extra)
-                .compose(_dio.options, '/v1/timer/${userId}',
+                .compose(_dio.options, '/api/timer',
                     queryParameters: queryParameters, data: _data)
                 .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = GetTimerResponse.fromJson(_result.data!);

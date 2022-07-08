@@ -1,7 +1,12 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:gdsc_timer/api/user-api-client.dart';
 import 'package:gdsc_timer/shared/common.dart';
+import 'package:dio/dio.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:mobx/mobx.dart';
+
+import '../domain/user-setting.dart';
+
 part 'auth-store.g.dart';
 
 final authStorage = FlutterSecureStorage();
@@ -13,22 +18,52 @@ abstract class _AuthStore with Store {
   String username = '';
 
   @observable
+  String email = '';
+
+  @observable
   String accessToken = '';
 
   @observable
   String refreshToken = '';
 
+  @observable
+  UserSetting userSetting = UserSetting();
+
   @action
   Future<void> load() async {
-    accessToken = await authStorage.read(key: 'accessToken') ?? '';
-    refreshToken = await authStorage.read(key: 'refreshToken') ?? '';
+    var accessToken = await authStorage.read(key: 'accessToken') ?? '';
+    var refreshToken = await authStorage.read(key: 'refreshToken') ?? '';
     logger.d('accessToken: $accessToken');
     logger.d('refreshToken: $refreshToken');
+
+    await login(accessToken, refreshToken);
+  }
+
+  Future<void> loadProfile() async {
+    try {
+      var client = new UserApiClient(makeDio());
+      var response = await client.getUser();
+      username = response.username;
+      email = response.email;
+
+      var setting = await client.getUserSetting();
+      userSetting = UserSetting(timerDuration: setting.timerDuration, restDuration: setting.restDuration, restAutoStart: setting.restAutoStart);
+
+    } catch (e) {
+      logger.e(e);
+      await logout();
+    }
+  }
+
+  Dio makeDio() {
+    var dio = Dio();
+    dio.options.headers['Authorization'] = 'Bearer $accessToken';
+    return dio;
   }
 
   @action
-  void login(String accessToken, String refreshToken) {
-    try{
+  Future<void> login(String accessToken, String refreshToken) async {
+    try {
       if (JwtDecoder.isExpired(accessToken) || JwtDecoder.isExpired(refreshToken)) {
         logger.d("INVALID ACCESS / REFRESH TOKEN EXPIRATION");
         return;
@@ -36,8 +71,9 @@ abstract class _AuthStore with Store {
       this.accessToken = accessToken;
       this.refreshToken = refreshToken;
 
-      authStorage.write(key: 'accessToken', value: accessToken);
-      authStorage.write(key: 'refreshToken', value: refreshToken);
+      await authStorage.write(key: 'accessToken', value: accessToken);
+      await authStorage.write(key: 'refreshToken', value: refreshToken);
+      await loadProfile();
     } on FormatException catch (_, e) {
       logger.d("token format error: " + e.toString());
       return;

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gdsc_timer/domain/user-setting.dart';
 import 'package:gdsc_timer/shared/app_colors.dart';
 import 'package:gdsc_timer/shared/common-components.dart';
 import 'package:gdsc_timer/store/auth-store.dart';
@@ -19,18 +20,19 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthStore>(context);
 
+    var userSetting = auth.userSetting;
     var settings = [
-      Setting("Email", widget: Text("yano24@naver.com")),
-      Setting("Timer duration", widget: Text("50:00"), hasArrow: true),
+      Setting("Email", widget: Text(auth.email)),
+      Setting("Timer duration", widget: Text(formatTime(userSetting.timerDuration)), hasArrow: true),
       Setting("Timer auto start", widget: Switch(value: false, onChanged: (v) {})),
-      Setting("Rest duration", widget: Text("15:00"), hasArrow: true),
+      Setting("Rest duration", widget: Text(formatTime(userSetting.restDuration)), hasArrow: true),
       Setting("Rest auto start", widget: Switch(value: false, onChanged: (v) {})),
       Setting("Alert", widget: Switch(value: false, onChanged: (v) {})),
       Setting("Reset"),
       Setting("Help", hasArrow: true),
       Setting("Terms of service", hasArrow: true),
       Setting("Version", widget: Text("1.0.1")),
-      Setting("Singout", onTap: () {
+      Setting("Logout", onTap: () {
         showDialog(
             context: context,
             builder: (context) {
@@ -103,4 +105,6 @@ class SettingsPage extends StatelessWidget {
       ),
     );
   }
+
+  String formatTime(int duration) => Duration(seconds: duration).toString().split('.')[0];
 }

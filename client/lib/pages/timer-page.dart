@@ -39,7 +39,7 @@ class TimerPage extends StatelessWidget {
       };
       var displayTime = timerStore.durationTime;
       var currentValue = min(timerStore.duration.inSeconds.toDouble() / maximumSeconds, 1.toDouble());
-      if (timerStore.status != TimerStatus.ready) {
+      if (timerStore.status != TimerStatus.READY) {
         onChange = null;
         displayTime = timerStore.remainedTime;
         currentValue = timerStore.percent;
@@ -112,7 +112,7 @@ class TimerButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final timer = Provider.of<TimerStore>(context);
     return Observer(builder: (_) {
-      if (timer.status == TimerStatus.ready) {
+      if (timer.status == TimerStatus.READY) {
         return IconButton(
           icon: const Icon(Icons.play_arrow, color: AppColors.primary),
           iconSize: 48,
@@ -124,7 +124,7 @@ class TimerButton extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            timer.status == TimerStatus.paused
+            timer.status == TimerStatus.PAUSED
                 ? IconButton(
                     icon: const Icon(Icons.play_arrow, color: AppColors.primary),
                     iconSize: 48,

@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter/foundation.dart';
 
-final timerStore = TimerStore();
 final authStore = AuthStore();
 
 void main() async {
@@ -43,20 +42,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return Provider<TimerStore>(
-      create: (_) => timerStore,
-      child: Provider<AuthStore>(
-          create: (_) => authStore,
-          child: InAppNotification(
-            child: MaterialApp(
-              title: 'Flutter Demo',
-              theme: ThemeData(
-                primarySwatch: Colors.blue,
-              ),
-              routes: routes,
-              initialRoute: authStore.isLoggedIn ? '/' : '/login',
-            ),
-          )),
+    return Provider<AuthStore>(
+      create: (_) => authStore,
+      child: InAppNotification(
+        child: MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          routes: routes,
+          initialRoute: authStore.isLoggedIn ? '/' : '/login',
+        ),
+      )
     );
   }
 }
