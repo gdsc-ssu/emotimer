@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:gdsc_timer/api/timer-socket.dart';
 import 'package:gdsc_timer/shared/app_colors.dart';
 import 'package:gdsc_timer/shared/slider/sleek_circular_slider.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +38,7 @@ class TimerPage extends StatelessWidget {
         timerStore.duration = Duration(seconds: max(seconds - seconds % 5, 5));
       };
       var displayTime = timerStore.durationTime;
-      var currentValue = timerStore.duration.inSeconds.toDouble() / maximumSeconds;
+      var currentValue = min(timerStore.duration.inSeconds.toDouble() / maximumSeconds, 1.toDouble());
       if (timerStore.status != TimerStatus.ready) {
         onChange = null;
         displayTime = timerStore.remainedTime;
