@@ -15,14 +15,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
     private final ModelMapper modelMapper;
     private final UserService userService;
 
-    @GetMapping("/") // 메인 페이지. 소셜 로그인할 수 있는 링크들 있음.
+    @GetMapping("/view") // 메인 페이지. 소셜 로그인할 수 있는 링크들 있음.
     public String hello(@CurrentUser User user) {
         return "index";
     }
@@ -33,9 +33,22 @@ public class UserController {
      * @param pageable
      * @return
      */
-    @GetMapping("/users")
+    @GetMapping("/")
     public ResponseEntity<Page<GetUserResponse>> getUsers(Pageable pageable) {
         return ResponseEntity.ok(userService.queryAllUser(pageable).map(GetUserResponse::new));
+    }
+
+
+
+    /**
+     * 해당 유저
+     *
+     * @param user
+     * @return
+     */
+    @GetMapping("/me")
+    public ResponseEntity<GetUserResponse> getMyProfile(@CurrentUser User user) {
+        return ResponseEntity.ok(new GetUserResponse(user));
     }
 
 
@@ -45,7 +58,7 @@ public class UserController {
      * @param user
      * @return
      */
-    @GetMapping("/setting")
+    @GetMapping("/me/setting")
     public ResponseEntity<UserSettingResponse> getSetting(@CurrentUser User user) {
         UserSettingResponse response = userService.querySetting(user);
         return ResponseEntity.ok(response);
@@ -56,12 +69,11 @@ public class UserController {
      *
      * @param request
      * @param user
-     * @return
      */
-    @PatchMapping("/setting")
+    @PatchMapping("/me/setting")
     public ResponseEntity<String> updateSetting(@RequestBody UserSettingRequest request, @CurrentUser User user) {
         userService.update(request, user);
-        return ResponseEntity.ok("OK");
+        return ResponseEntity.noContent().build();
     }
 
 }
