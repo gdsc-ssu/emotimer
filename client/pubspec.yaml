@@ -45,6 +45,12 @@ dependencies:
   logger: any
   web_socket_channel: ^2.2.0
   stomp_dart_client: ^0.4.4
+  flutter_secure_storage: ^5.0.2
+  jwt_decoder: ^2.0.1
+  flutter_web_auth: ^0.4.1
+  flutter_svg: ^1.1.1+1
+  uuid: ^3.0.6
+  in_app_notification: ^1.1.2
 
 dev_dependencies:
   build_runner: ^2.1.7
