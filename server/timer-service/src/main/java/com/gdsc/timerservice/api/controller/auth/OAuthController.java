@@ -1,23 +1,14 @@
 package com.gdsc.timerservice.api.controller.auth;
 
-import com.gdsc.timerservice.api.entity.user.User;
 import com.gdsc.timerservice.api.service.auth.OAuth2Service;
-import com.gdsc.timerservice.oauth.entity.RoleType;
 import com.gdsc.timerservice.oauth.exception.OAuthProviderMissMatchException;
-import com.gdsc.timerservice.oauth.handler.OAuth2AuthenticationSuccessHandler;
 import com.gdsc.timerservice.oauth.model.TokenResponse;
 import com.gdsc.timerservice.oauth.service.IssueRefreshService;
+import com.gdsc.timerservice.oauth.token.AppleOAuthRetriever;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +16,8 @@ public class OAuthController {
 
     private final OAuth2Service oAuth2Service;
     private final IssueRefreshService issueRefreshService;
-    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+
+    private final AppleOAuthRetriever appleOAuthRetriever;
 
     /**
      * 사용자의 카카오 로그인 요청 후, 로그인한 다음 리다이렉트된 경로.<br/><br/>
@@ -36,22 +28,23 @@ public class OAuthController {
      */
     @GetMapping(value = "/callback/{vendor}", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> codeFromKakao(@RequestParam String code,
-                                           @PathVariable String vendor) throws IOException {
+                                           @PathVariable String vendor) {
         // 강제 회원가입 시작
         try {
-            User user = oAuth2Service.socialJoin(code, vendor);
-            TokenResponse tokenResponse = oAuth2Service.generateToken(user.getUserId(), user.getEmail(), RoleType.USER);
+            var tokenResponse = oAuth2Service.socialJoin(code, vendor);
             return ResponseEntity.ok()
                     .body(tokenResponse);
         } catch (OAuthProviderMissMatchException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(e.getMessage());
         }
     }
 
     @GetMapping("/refresh")
-    public ResponseEntity refresh(HttpServletRequest request, HttpServletResponse response) {
-        issueRefreshService.refreshToken(request, response);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<TokenResponse> refresh(@RequestHeader(name = "refresh_token") String refreshToken) {
+        TokenResponse tokenResponse = issueRefreshService.refreshToken(refreshToken);
+        return ResponseEntity.ok()
+                .body(tokenResponse);
     }
 
 

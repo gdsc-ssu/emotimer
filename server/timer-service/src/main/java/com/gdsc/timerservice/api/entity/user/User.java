@@ -11,6 +11,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -22,6 +23,14 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+
+
+    /**
+     * 각 사용자마다 부여된 UUID
+     */
+    @Builder.Default
+    @Column(unique = true, nullable = false)
+    private String uuid = UUID.randomUUID().toString();
 
     @NotNull
     @Size(max = 512)

@@ -1,6 +1,5 @@
 package com.gdsc.timerservice.api.service.auth;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gdsc.timerservice.api.entity.user.User;
 import com.gdsc.timerservice.api.entity.user.UserSetting;
@@ -10,24 +9,19 @@ import com.gdsc.timerservice.api.repository.user.UserSettingRepository;
 import com.gdsc.timerservice.config.properties.AppProperties;
 import com.gdsc.timerservice.oauth.entity.ProviderType;
 import com.gdsc.timerservice.oauth.entity.RoleType;
-import com.gdsc.timerservice.oauth.exception.OAuthProviderMissMatchException;
-import com.gdsc.timerservice.oauth.model.AbstractOAuthToken;
 import com.gdsc.timerservice.oauth.model.AbstractProfile;
-import com.gdsc.timerservice.oauth.model.OAuthVendor;
 import com.gdsc.timerservice.oauth.model.TokenResponse;
 import com.gdsc.timerservice.oauth.token.AuthToken;
 import com.gdsc.timerservice.oauth.token.AuthTokenProvider;
+import com.gdsc.timerservice.oauth.token.OAuthRetriever;
+import com.gdsc.timerservice.oauth.token.OAuthRetrieverFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -45,24 +39,26 @@ public class OAuth2Service {
     private final AppProperties appProperties;
     private final UserRefreshTokenRepository userRefreshTokenRepository;
 
+    private final OAuthRetrieverFactory oAuthRetrieverFactory;
+
 
     @Transactional
-    public TokenResponse generateToken(Long id, String email, RoleType kakao) throws IOException {
+    public TokenResponse generateToken(String uuid, String email) {
         // access token 생성
         Date now = new Date();
         Date accessExpiry = new Date(now.getTime() + appProperties.getAuth().getTokenExpiry());
-        AuthToken accessToken = tokenProvider.createAuthToken(id, email, accessExpiry);
+        AuthToken accessToken = tokenProvider.createAuthToken(uuid, email, accessExpiry);
 
         // refresh token 생성
         long refreshTokenExpiry = appProperties.getAuth().getRefreshTokenExpiry();
         Date refreshExpiry = new Date(now.getTime() + refreshTokenExpiry);
-        AuthToken refreshToken = tokenProvider.createAuthToken(id, email, refreshExpiry);
+        AuthToken refreshToken = tokenProvider.createAuthToken(uuid, email, refreshExpiry);
 
-        userRefreshTokenRepository.findById(id)
+        userRefreshTokenRepository.findByUuid(uuid)
                 .ifPresentOrElse(findToken -> {
                     findToken.setRefreshToken(refreshToken.getToken());
                 }, () -> {
-                    userRefreshTokenRepository.saveNewRefreshToken(id, email, refreshToken.getToken());
+                    userRefreshTokenRepository.saveNewRefreshToken(uuid, email, refreshToken.getToken());
                 });
 
         return new TokenResponse(accessToken.getToken(), refreshToken.getToken());
@@ -73,18 +69,26 @@ public class OAuth2Service {
      * 이전에 가입된 회원이라면(이메일로 회원 조회시 값 존재) updateUser 로 소셜의 사용자 정보를 업데이트하여 저장한다.<br/>
      * 만약 이전에 가입된 회원이지만(이메일로 회원 조회시 값 존재), 이전에 가입했던 소셜 벤더가 아니라면 OAuthProviderMissMatchException 익셉션을 던진다.<br/>
      */
+//    @Transactional
+//    public User socialJoin(String code, String vendor) throws JsonProcessingException {
+//        var profile = getProfile(code, vendor);
+//        return findUser(profile);
+//    }
     @Transactional
-    public User socialJoin(String code, String vendor) throws JsonProcessingException {
-        var profile = getProfile(code, vendor);
-        return findUser(profile);
+    public TokenResponse socialJoin(String code, String vendor) {
+        OAuthRetriever oAuthRetriever = oAuthRetrieverFactory.getOAuthRetrieverByVendor(vendor);
+        String userInfo = oAuthRetriever.getUserInfo(code);
+        //TODO user 가입
+        User oAuthUser = createOAuthUser(userInfo, ProviderType.get(vendor));
+        //TODO token 생성
+        return generateToken(oAuthUser.getUuid(), userInfo);
     }
 
     /**
      * 중복 가입을 막기 위한 검증을 한다.
      * 현재 소셜 벤더와 로그인을 시도하는 유저의 이메일로 User 테이블의 벤더사를 비교하여 일치 여부를 반환한다.
      *
-     *
-     * @param profile 현재 소셜 로그인을 시도하는 유저의 프로필 정보
+     * @param profile      현재 소셜 로그인을 시도하는 유저의 프로필 정보
      * @param existingUser 현재 소셜 로그인을 시도하는 유저의 이메일로 User 테이블 조회시 반환된 유저
      * @return 최초 로그인했던 소셜 벤더와 현재 로그인하려는 소셜 벤더의 일치 여부
      */
@@ -92,20 +96,11 @@ public class OAuth2Service {
         return profile.getProviderType() != existingUser.getProviderType();
     }
 
-    private User findUser(AbstractProfile profile) {
-        Optional<User> optionalUser = userRepository.findByEmail(profile.getEmail());
-        optionalUser.ifPresent(existingUser -> {
-            if (isAlreadyJoined(profile, existingUser)) {
-                throw new OAuthProviderMissMatchException("이전에 " + existingUser.getEmail() + " 계정으로 로그인하셨던 적이 있습니다.");
-            }
-        });
-        return optionalUser.orElseGet(() -> createOAuthUser(profile.getEmail(), profile.getUsername(), profile.getProviderType()));
-    }
-    private User createOAuthUser(String email, String username, ProviderType providerType) {
+
+    private User createOAuthUser(String email, ProviderType providerType) {
         User user = User.builder()
                 .email(email)
                 .password(UUID.randomUUID().toString()) // 비밀번호는 일단 그냥 UUID 로 하겠음.
-                .username(username)
                 .providerType(providerType)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -124,37 +119,5 @@ public class OAuth2Service {
         userSettingRepository.saveAndFlush(userSetting);
 
         return savedUser;
-    }
-
-    private AbstractProfile getProfile(String code, String vendor) throws JsonProcessingException {
-        OAuthVendor vendorEnum = OAuthVendor.getVendor(vendor);
-        String accessToken = getToken(code, vendorEnum);
-        // 2. 액세스 토큰을 요청헤더에 담아 카카오 리소스 서버에 사용자 정보(이메일, 프로필) 요청
-        // HttpHeader 생성. 인증타입과 Content-type 명시하기 위함.
-        // Http 요청하고 응답받기
-        ResponseEntity<String> profileResponse = restTemplate.exchange(
-                vendorEnum.getProfileUrl(),
-                HttpMethod.POST,
-                vendorEnum.createProfileRequest(accessToken),
-                String.class
-        );
-
-        // 유저 프로필 매핑 완료
-        return objectMapper.readValue(profileResponse.getBody(), vendorEnum.getProfileClass());
-    }
-
-    private String getToken(String code, OAuthVendor vendorEnum) throws JsonProcessingException {
-        // 액세스 토큰 요청하는 Http 요청과 응답
-        ResponseEntity<String> accessTokenResponse = restTemplate.exchange(
-                vendorEnum.getTokenUrl(),
-                HttpMethod.POST,
-                vendorEnum.createAccessTokenRequest(code),
-                String.class);
-
-        // 응답받은 json 데이터
-        AbstractOAuthToken oauthToken =
-                objectMapper.readValue(accessTokenResponse.getBody(), vendorEnum.getTokenClass());
-        // 리소스 서버에 접근할 수 있는 액세스 토큰 꺼내기
-        return oauthToken.getAccessToken();
     }
 }
