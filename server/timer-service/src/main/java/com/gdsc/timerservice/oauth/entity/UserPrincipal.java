@@ -2,25 +2,32 @@ package com.gdsc.timerservice.oauth.entity;
 
 import com.gdsc.timerservice.api.entity.user.User;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import java.util.Collection;
+
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
-public class UserPrincipal implements OAuth2User, UserDetails {
+public class UserPrincipal extends org.springframework.security.core.userdetails.User implements OAuth2User {
 
     private User user;
     private Map<String, Object> oauthUserAttributes;
 
-    public UserPrincipal(User user, Map<String, Object> oauthUserAttributes){
+    public UserPrincipal(User user, Map<String, Object> oauthUserAttributes) {
+        super(user.getUsername(), user.getPassword(), convertToAuthorities(user));
         this.user = user;
         this.oauthUserAttributes = oauthUserAttributes;
+    }
+
+    private static Set<SimpleGrantedAuthority> convertToAuthorities(User user) {
+        return Stream.of(user.getRoleType().getCode())
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toSet());
     }
 
 
@@ -49,10 +56,6 @@ public class UserPrincipal implements OAuth2User, UserDetails {
         return null;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
 
     @Override
     public String getPassword() {

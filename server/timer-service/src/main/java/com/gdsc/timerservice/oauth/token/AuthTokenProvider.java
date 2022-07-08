@@ -1,6 +1,8 @@
 package com.gdsc.timerservice.oauth.token;
 
+import com.gdsc.timerservice.api.repository.user.UserRepository;
 import com.gdsc.timerservice.config.properties.AppProperties;
+import com.gdsc.timerservice.oauth.entity.UserPrincipal;
 import com.gdsc.timerservice.oauth.exception.TokenValidFailedException;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -23,6 +26,7 @@ import java.util.stream.Collectors;
 public class AuthTokenProvider {
     private static final String AUTHORITIES_KEY = "role";
     private final AppProperties appProperties;
+    private final UserRepository userRepository;
 
     public AuthToken createAuthToken(Long id, String email, Date expiry) {
         return new AuthToken(appProperties, id, email, expiry);
@@ -42,12 +46,18 @@ public class AuthTokenProvider {
                             .collect(Collectors.toList());
 
             log.debug("claims subject := [{}]", claims.getSubject());
-            User principal = new User(claims.getSubject(), "", authorities);
+            var user = findUser(claims);
+            User principal = new UserPrincipal(user,null);
 
             return new UsernamePasswordAuthenticationToken(principal, authToken, authorities);
         } else {
             throw new TokenValidFailedException();
         }
+    }
+
+    private com.gdsc.timerservice.api.entity.user.User findUser(Claims claims) {
+        return userRepository.findById(Long.parseLong(claims.get("id").toString()))
+                .orElseThrow(() -> new UsernameNotFoundException(claims.get("id") + "에 해당하는 유저를 찾을 수 없습니다."));
     }
 
 }

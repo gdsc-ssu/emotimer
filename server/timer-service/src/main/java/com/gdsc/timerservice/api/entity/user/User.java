@@ -18,59 +18,44 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "USER")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "USER_ID")
     private Long userId;
 
     @NotNull
     @Size(max = 512)
-    @Column(name = "EMAIL", unique = true) // 이메일은 유일
     private String email;
 
     @JsonIgnore
     @NotNull
     @Size(max = 128)
-    @Column(name = "PASSWORD")
     private String password;
 
-//    @NotNull
-    @Size(max = 100)
-    @Column(name = "USERNAME")
-    private String username;
 
-//    @NotNull
-//    @Column(name = "PROFILE_IMAGE_URL")
-//    @Size(max = 512)
-//    private String profileImageUrl;
+    @Size(max = 100)
+    private String username;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "PROVIDER_TYPE", length = 20)
     private ProviderType providerType;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "ROLE_TYPE", length = 20)
     private RoleType roleType;
 
     @NotNull
-    @Column(name = "UPDATED_AT")
     @CreatedDate
     private LocalDateTime updatedAt;
 
     @NotNull
     @LastModifiedDate
-    @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
 
-    @Column(name = "IMAGE_URL")
     private String imageUrl;
 
     @Builder
-    public User(String email, String password, String username, ProviderType providerType, RoleType roleType){
+    public User(String email, String password, String username, ProviderType providerType, RoleType roleType) {
         this.email = email;
         this.password = password;
         this.username = username;
@@ -80,5 +65,11 @@ public class User {
 
     public User(Long userId) {
         this.userId = userId;
+    }
+
+    public User(User user) {
+        this.username = user.getUsername();
+        this.roleType = user.getRoleType();
+        this.email = user.getEmail();
     }
 }

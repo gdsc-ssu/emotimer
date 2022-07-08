@@ -12,6 +12,7 @@ import com.gdsc.timerservice.oauth.token.AuthToken;
 import com.gdsc.timerservice.oauth.token.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -32,7 +33,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
     private final AuthTokenProvider tokenProvider;
     private final AppProperties appProperties;
     private final UserRefreshTokenRepository userRefreshTokenRepository;
@@ -44,7 +46,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     /**
-     * @param request
      * @param response
      * @param authentication
      * @return 리다이렉트할 Url 반환, 액세스 토큰과 리프레시 토큰 생성하여 응답 헤더에 담기 수행.
@@ -75,10 +76,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             token.setRefreshToken(refreshToken.getToken());
         } else { // 기존에 리프레시 토큰을 한번도 발급받지 않은 유저, 즉 현재 처음으로 소셜로그인하는 경우, refresh token 신규 저장.
             UserRefreshToken newToken = UserRefreshToken.builder()
+                    .user(user)
                     .email(user.getEmail())
                     .refreshToken(refreshToken.getToken())
                     .build();
-            userRefreshTokenRepository.saveAndFlush(newToken);
+            userRefreshTokenRepository.save(newToken);
         }
 
         response.setStatus(HttpServletResponse.SC_OK); // 200

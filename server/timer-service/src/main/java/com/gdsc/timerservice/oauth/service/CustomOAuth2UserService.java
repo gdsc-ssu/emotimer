@@ -1,7 +1,9 @@
 package com.gdsc.timerservice.oauth.service;
 
 import com.gdsc.timerservice.api.entity.user.User;
+import com.gdsc.timerservice.api.entity.user.UserSetting;
 import com.gdsc.timerservice.api.repository.user.UserRepository;
+import com.gdsc.timerservice.api.repository.user.UserSettingRepository;
 import com.gdsc.timerservice.oauth.entity.ProviderType;
 import com.gdsc.timerservice.oauth.entity.RoleType;
 import com.gdsc.timerservice.oauth.entity.UserPrincipal;
@@ -19,6 +21,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -29,13 +32,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+
     private final UserRepository userRepository;
+    private final UserSettingRepository userSettingRepository;
 
     // 방금 로그인 완료한 사용자가 이미 회원가입이 되어있는 사람인지 체크. DB 뒤짐.
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        log.info("구글로부터 받은 userRequest 데이터: {}", userRequest);
-        log.info("구글로부터 받은 userRequest 데이터를 스프링 oauth 가 후처리한 뒤: {}", super.loadUser(userRequest).getAttributes());
         OAuth2User user = super.loadUser(userRequest);
 
         try{
@@ -52,21 +55,21 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         ProviderType providerType = ProviderType.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase()); // 벤더 이름 뽑아냄.
         OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType,user.getAttributes());
 
-        User savedUser = userRepository.findByEmail(userInfo.getEmail()); // 우리 애플리케이션 DB 에 회원 이메일이 있는지 없는지 확인.
+        User savedUser = findUser(providerType, userInfo);
+        return new UserPrincipal(savedUser, user.getAttributes());
+    }
 
-        if(savedUser != null){ // 기존에 가입되었었던 회원이라면
-
+    private User findUser(ProviderType providerType, OAuth2UserInfo userInfo) {
+        Optional<User> optionalUser = userRepository.findByEmail(userInfo.getEmail());
+        optionalUser.ifPresent(savedUser -> {
             if (providerType != savedUser.getProviderType()){ // 가입된 회원이긴 한데 이전에 로그인한 소셜과 다른 소셜로 로그인 한 경우.
                 throw new OAuthProviderMissMatchException(
-                      "이전에 " + providerType + " 계정으로 로그인하셨던 적이 있습니다. "  + providerType + " 으로 로그인해주세요."
+                        "이전에 " + providerType + " 계정으로 로그인하셨던 적이 있습니다. "  + providerType + " 으로 로그인해주세요."
                 );
             }
-            savedUser = updateUser(savedUser, userInfo); // 그냥 유저 정보 업데이트 된거 있으면 업데이트만!
-        }else{
-            savedUser = createUser(userInfo, providerType); // 처음 로그인하는 회원이라면 유저 생성하여 DB 에 저장.
-        }
-
-        return new UserPrincipal(savedUser, user.getAttributes());
+            updateUser(savedUser, userInfo); // 그냥 유저 정보 업데이트 된거 있으면 업데이트만!
+        });
+        return optionalUser.orElse(createUser(userInfo, providerType));
     }
 
     // 새로운 유저 생성하여 DB 에 저장
@@ -80,8 +83,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+        User savedUser = userRepository.saveAndFlush(user);
+        // default 유저 세팅 저장
+        UserSetting userSetting = UserSetting.builder()
+                .user(user)
+                .timerDuration(25)
+                .restDuration(5)
+                .restAutoStart(false)
+                .build();
+        userSettingRepository.saveAndFlush(userSetting);
 
-        return userRepository.saveAndFlush(user); // DB 에 유저 저장.
+        return savedUser;
     }
 
     // 기존 유저. 업데이트 된거 있으면 업뎃.
