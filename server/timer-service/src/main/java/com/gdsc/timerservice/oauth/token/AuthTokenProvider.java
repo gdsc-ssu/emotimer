@@ -56,7 +56,7 @@ public class AuthTokenProvider {
 	}
 
 	private com.gdsc.timerservice.api.entity.user.User findUser(Claims claims) {
-		return userRepository.findById(Long.parseLong(claims.get("id").toString()))
+		return userRepository.findById(claims.get("id").toString())
 			.orElseThrow(() -> new UsernameNotFoundException(claims.get("id") + "에 해당하는 유저를 찾을 수 없습니다."));
 	}
 
