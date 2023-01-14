@@ -1,9 +1,12 @@
 <h1 align="center">Emotimer ⏰</h1>
+
 <p>
   <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000" />
 </p>
 
-> Emotimer
+> #### 웹소켓을 이용한 다중기기 동시 타이머
+
+&nbsp;
 
 ## 기술 스택
 <p>
