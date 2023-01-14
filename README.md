@@ -1,9 +1,9 @@
-<h1 align="center">Emotimer Server 👋</h1>
+<h1 align="center">Emotimer ⏰</h1>
 <p>
   <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000" />
 </p>
 
-> Emotimer Server
+> Emotimer
 
 ## 기술 스택
 <p>
